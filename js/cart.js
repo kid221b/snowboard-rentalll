@@ -367,3 +367,6 @@ const Cart = {
 
 // 初始化购物车
 Cart.init();
+
+// 暴露到全局，供 app.js 调用
+window.Cart = Cart;
