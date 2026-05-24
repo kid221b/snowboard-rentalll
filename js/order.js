@@ -3,6 +3,8 @@
  * 负责租赁日期选择、配件选择、个人信息填写、订单确认和提交
  */
 
+import { createOrder, updateOrderStatus, getAllOrders } from './api.js';
+
 const OrderFlow = {
     // 当前步骤
     currentStep: 1,
@@ -493,7 +495,7 @@ const OrderFlow = {
     /**
      * 提交订单
      */
-    submitOrder() {
+    async submitOrder() {
         // 检查同意协议
         const agreeCheckbox = document.getElementById('agreeTerms');
         if (agreeCheckbox && !agreeCheckbox.checked) {
@@ -504,6 +506,14 @@ const OrderFlow = {
         const cart = SnowboardData.getCart();
         if (cart.length === 0) {
             App.showToast('购物车为空', 'error');
+            return;
+        }
+
+        // 收集个人信息
+        this.collectPersonalInfo();
+        const errors = this.validatePersonalInfo();
+        if (errors.length > 0) {
+            App.showToast(errors[0], 'error');
             return;
         }
 
@@ -529,24 +539,39 @@ const OrderFlow = {
 
         // 配件费用
         let accessoryTotal = 0;
-        const accessories = [];
+        const accessoryIds = [];
         this.selectedAccessories.forEach(acc => {
             accessoryTotal += acc.price * this.rentDays;
-            accessories.push({
-                accessoryId: acc.id,
-                name: acc.name,
-                pricePerDay: acc.price,
-                days: this.rentDays
-            });
+            accessoryIds.push(acc.id);
         });
 
         const discount = Cart.getPackageDiscount();
         const total = Math.round((subtotal + accessoryTotal) * this.rentDays * discount);
 
-        // 创建订单
-        const order = {
+        // 构造订单数据（匹配 SQL schema）
+        const orderData = {
+            product_id: items[0]?.productId || '',
+            accessory_ids: accessoryIds,
+            start_date: this.rentStartDate,
+            end_date: this.rentEndDate,
+            total_days: this.rentDays,
+            total_price: total,
+            deposit: deposit
+        };
+
+        // 保存到 Supabase
+        const result = await createOrder(orderData);
+
+        if (!result.success) {
+            App.showToast(result.error || '下单失败', 'error');
+            return;
+        }
+
+        // 同时保存到本地作为备份
+        const localOrder = {
+            id: result.orderId || 'ORD' + Date.now().toString(36).toUpperCase(),
             items: items,
-            accessories: accessories,
+            accessories: this.selectedAccessories,
             rentStartDate: this.rentStartDate,
             rentEndDate: this.rentEndDate,
             rentDays: this.rentDays,
@@ -563,12 +588,7 @@ const OrderFlow = {
             status: 'pending',
             createdAt: new Date().toISOString()
         };
-
-        // 保存订单
-        const orderId = SnowboardData.addOrder(order);
-
-        // 更新用户
-        const userId = this.updateUserIfNeeded();
+        SnowboardData.addOrder(localOrder);
 
         // 清空购物车
         Cart.clear();
@@ -578,7 +598,7 @@ const OrderFlow = {
             <div style="text-align: center; padding: 20px;">
                 <div style="font-size: 4rem; margin-bottom: 16px;">🎉</div>
                 <h2 style="color: var(--success-color); margin-bottom: 16px;">订单提交成功！</h2>
-                <p>订单号：<strong style="color: var(--primary-color);">${orderId}</strong></p>
+                <p>订单号：<strong style="color: var(--primary-color);">${localOrder.id}</strong></p>
                 <p style="color: var(--text-secondary);">我们将在24小时内与您联系确认订单</p>
                 <div style="margin-top: 24px;">
                     <button class="btn btn-primary btn-block" onclick="App.closeModal(); App.navigateTo('orders');">
@@ -649,7 +669,7 @@ const OrderHistory = {
     /**
      * 筛选订单
      */
-    filter(status) {
+    async filter(status) {
         this.filterStatus = status;
 
         // 更新标签状态
@@ -660,17 +680,26 @@ const OrderHistory = {
             }
         });
 
-        this.render();
+        await this.render();
     },
 
     /**
      * 渲染订单列表
      */
-    render() {
+    async render() {
         const container = document.getElementById('ordersList');
         if (!container) return;
 
-        let orders = SnowboardData.getOrders();
+        // 从 Supabase 获取所有订单（RLS 公开，游客也可查）
+        let orders = await getAllOrders();
+
+        // 如果 Supabase 无数据，从本地存储获取作为降级方案
+        if (!orders || orders.length === 0) {
+            const localOrders = SnowboardData.getOrders();
+            if (localOrders && localOrders.length > 0) {
+                orders = localOrders;
+            }
+        }
 
         // 筛选
         if (this.filterStatus !== 'all') {
@@ -690,7 +719,7 @@ const OrderHistory = {
         }
 
         container.innerHTML = orders.map(order => {
-            const firstItem = order.items[0] || {};
+            const firstItem = order.items?.[0] || {};
             const product = firstItem.productName || '单板';
             const statusText = {
                 pending: '待取板',
@@ -708,10 +737,10 @@ const OrderHistory = {
                     <div class="order-content">
                         <div class="order-product">🏂</div>
                         <div class="order-info">
-                            <p><strong>${product}</strong> 等${order.items.length}件装备</p>
-                            <p>📅 ${App.formatDateDisplay(order.rentStartDate)} - ${App.formatDateDisplay(order.rentEndDate)} (${order.rentDays}天)</p>
-                            <p>💰 总价 ¥${order.total} | 押金 ¥${order.deposit}</p>
-                            <p>👤 ${order.userName} | ${order.userPhone}</p>
+                            <p><strong>${product}</strong> 等${order.items?.length || 0}件装备</p>
+                            <p>📅 ${App.formatDateDisplay(order.start_date || order.rentStartDate)} - ${App.formatDateDisplay(order.end_date || order.rentEndDate)} (${order.total_days || order.rentDays}天)</p>
+                            <p>💰 总价 ¥${order.total_price || order.total} | 押金 ¥${order.deposit}</p>
+                            <p>👤 ${order.user_name || order.userName || '游客'}</p>
                         </div>
                     </div>
                     <div class="order-actions">
@@ -754,25 +783,17 @@ const OrderHistory = {
      */
     confirmRenew(orderId) {
         const days = parseInt(document.getElementById('extendDays').value) || 1;
-        const orders = SnowboardData.getOrders();
-        const order = orders.find(o => o.id === orderId);
-
-        if (order) {
-            const extraDays = days;
-            const extraTotal = Math.round(order.subtotal * extraDays * order.discount);
-
-            App.showModal(`
-                <div style="text-align: center;">
-                    <div style="font-size: 3rem;">✅</div>
-                    <h3>续租成功</h3>
-                    <p>原租期延长 ${extraDays} 天</p>
-                    <p>额外费用：¥${extraTotal}</p>
-                    <button class="btn btn-primary btn-block" onclick="App.closeModal(); OrderHistory.render();">
-                        确定
-                    </button>
-                </div>
-            `);
-        }
+        App.showModal(`
+            <div style="text-align: center;">
+                <div style="font-size: 3rem;">✅</div>
+                <h3>续租请求已提交</h3>
+                <p>原租期延长 ${days} 天</p>
+                <p>请等待客服确认</p>
+                <button class="btn btn-primary btn-block" onclick="App.closeModal(); OrderHistory.render();">
+                    确定
+                </button>
+            </div>
+        `);
     },
 
     /**
@@ -792,10 +813,13 @@ const OrderHistory = {
     /**
      * 确认取消订单
      */
-    confirmCancel(orderId) {
+    async confirmCancel(orderId) {
+        // 更新 Supabase
+        await updateOrderStatus(orderId, 'cancelled');
+        // 同时更新本地
         SnowboardData.updateOrderStatus(orderId, 'cancelled');
         App.closeModal();
         App.showToast('订单已取消');
-        this.render();
+        await this.render();
     }
 };
