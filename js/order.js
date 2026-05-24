@@ -3,7 +3,7 @@
  * 负责租赁日期选择、配件选择、个人信息填写、订单确认和提交
  */
 
-import { createOrder, updateOrderStatus, getAllOrders } from './api.js';
+import { createOrder, updateOrderStatus, getAllOrders, escapeHtml } from './api.js';
 
 const OrderFlow = {
     // 当前步骤
@@ -181,8 +181,8 @@ const OrderFlow = {
             <div class="accessory-item" data-id="${acc.id}" onclick="OrderFlow.toggleAccessory('${acc.id}')">
                 <input type="checkbox" ${this.selectedAccessories.find(a => a.id === acc.id) ? 'checked' : ''}>
                 <div class="accessory-info">
-                    <div class="accessory-name">${acc.name}</div>
-                    <div class="accessory-desc">${acc.description}</div>
+                    <div class="accessory-name">${escapeHtml(acc.name)}</div>
+                    <div class="accessory-desc">${escapeHtml(acc.description)}</div>
                 </div>
                 <div class="accessory-price">¥${acc.price}/天</div>
             </div>
@@ -344,11 +344,11 @@ const OrderFlow = {
                 <h4>📋 个人信息</h4>
                 <div class="item-row">
                     <span>姓名</span>
-                    <span>${this.personalInfo.name}</span>
+                    <span>${escapeHtml(this.personalInfo.name)}</span>
                 </div>
                 <div class="item-row">
                     <span>手机号</span>
-                    <span>${this.personalInfo.phone}</span>
+                    <span>${escapeHtml(this.personalInfo.phone)}</span>
                 </div>
                 <div class="item-row">
                     <span>取板方式</span>
@@ -357,7 +357,7 @@ const OrderFlow = {
                 ${this.personalInfo.pickupType === 'delivery' ? `
                     <div class="item-row">
                         <span>配送地址</span>
-                        <span>${this.personalInfo.deliveryAddress}</span>
+                        <span>${escapeHtml(this.personalInfo.deliveryAddress)}</span>
                     </div>
                 ` : ''}
             </div>
@@ -559,17 +559,22 @@ const OrderFlow = {
             deposit: deposit
         };
 
+        // 防重复提交：立即禁用按钮
+        const submitBtn = document.getElementById('submitOrderBtn');
+        if (submitBtn) submitBtn.disabled = true;
+
         // 保存到 Supabase
         const result = await createOrder(orderData);
 
         if (!result.success) {
             App.showToast(result.error || '下单失败', 'error');
+            document.getElementById('submitOrderBtn').disabled = false;
             return;
         }
 
-        // 同时保存到本地作为备份
+        // 同时保存到本地作为备份（使用 UUID 不可预测）
         const localOrder = {
-            id: result.orderId || 'ORD' + Date.now().toString(36).toUpperCase(),
+            id: result.orderId || crypto.randomUUID(),
             items: items,
             accessories: this.selectedAccessories,
             rentStartDate: this.rentStartDate,
@@ -598,7 +603,7 @@ const OrderFlow = {
             <div style="text-align: center; padding: 20px;">
                 <div style="font-size: 4rem; margin-bottom: 16px;">🎉</div>
                 <h2 style="color: var(--success-color); margin-bottom: 16px;">订单提交成功！</h2>
-                <p>订单号：<strong style="color: var(--primary-color);">${localOrder.id}</strong></p>
+                <p>订单号：<strong style="color: var(--primary-color);">${escapeHtml(localOrder.id)}</strong></p>
                 <p style="color: var(--text-secondary);">我们将在24小时内与您联系确认订单</p>
                 <div style="margin-top: 24px;">
                     <button class="btn btn-primary btn-block" onclick="App.closeModal(); App.navigateTo('orders');">
@@ -731,16 +736,16 @@ const OrderHistory = {
             return `
                 <div class="order-card">
                     <div class="order-header">
-                        <span class="order-id">${order.id}</span>
+                        <span class="order-id">${escapeHtml(order.id)}</span>
                         <span class="order-status ${order.status}">${statusText}</span>
                     </div>
                     <div class="order-content">
                         <div class="order-product">🏂</div>
                         <div class="order-info">
-                            <p><strong>${product}</strong> 等${order.items?.length || 0}件装备</p>
+                            <p><strong>${escapeHtml(product)}</strong> 等${order.items?.length || 0}件装备</p>
                             <p>📅 ${App.formatDateDisplay(order.start_date || order.rentStartDate)} - ${App.formatDateDisplay(order.end_date || order.rentEndDate)} (${order.total_days || order.rentDays}天)</p>
                             <p>💰 总价 ¥${order.total_price || order.total} | 押金 ¥${order.deposit}</p>
-                            <p>👤 ${order.user_name || order.userName || '游客'}</p>
+                            <p>👤 ${escapeHtml(order.user_name || order.userName || '游客')}</p>
                         </div>
                     </div>
                     <div class="order-actions">

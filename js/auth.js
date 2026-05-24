@@ -22,7 +22,7 @@ export async function login(email, password) {
         });
 
         if (error) {
-            return { success: false, error: error.message };
+            return { success: false, error: '登录失败，请检查邮箱和密码' };
         }
 
         currentUser = data.user;
@@ -52,10 +52,10 @@ export async function register(email, password, name, phone) {
                     phone: phone
                 }
             }
-        });
+            });
 
         if (error) {
-            return { success: false, error: error.message };
+            return { success: false, error: '注册失败，请稍后重试' };
         }
 
         // 创建用户资料

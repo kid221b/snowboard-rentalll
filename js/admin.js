@@ -3,6 +3,21 @@
  * 负责库存管理、订单管理、用户管理
  */
 
+/**
+ * HTML 转义，防止 XSS
+ * @param {string} str
+ * @returns {string}
+ */
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+}
+
 const Admin = {
     // 当前标签页
     currentTab: 'inventory',
@@ -64,10 +79,10 @@ const Admin = {
             const typeConfig = SnowboardData.TYPE_CONFIG[product.type] || {};
             return `
                 <tr>
-                    <td>${product.id}</td>
-                    <td>${product.name}</td>
-                    <td>${typeConfig.name || product.type}</td>
-                    <td>${product.brand}</td>
+                    <td>${escapeHtml(product.id)}</td>
+                    <td>${escapeHtml(product.name)}</td>
+                    <td>${escapeHtml(typeConfig.name || product.type)}</td>
+                    <td>${escapeHtml(product.brand)}</td>
                     <td>¥${product.price}/天</td>
                     <td>
                         <span class="${product.stock > 5 ? 'text-success' : product.stock > 0 ? 'text-warning' : 'text-danger'}">
@@ -75,8 +90,8 @@ const Admin = {
                         </span>
                     </td>
                     <td>
-                        <button class="action-btn edit" onclick="Admin.editProduct('${product.id}')">编辑</button>
-                        <button class="action-btn delete" onclick="Admin.deleteProduct('${product.id}')">删除</button>
+                        <button class="action-btn edit" onclick="Admin.editProduct('${escapeHtml(product.id)}')">编辑</button>
+                        <button class="action-btn delete" onclick="Admin.deleteProduct('${escapeHtml(product.id)}')">删除</button>
                     </td>
                 </tr>
             `;
@@ -200,14 +215,14 @@ const Admin = {
         App.showModal(`
             <h3>编辑产品</h3>
             <form class="form" id="editProductForm">
-                <input type="hidden" id="editProductId" value="${product.id}">
+                <input type="hidden" id="editProductId" value="${escapeHtml(product.id)}">
                 <div class="form-group">
                     <label>产品名称 *</label>
-                    <input type="text" id="editProductName" required value="${product.name}">
+                    <input type="text" id="editProductName" required value="${escapeHtml(product.name)}">
                 </div>
                 <div class="form-group">
                     <label>品牌 *</label>
-                    <input type="text" id="editProductBrand" required value="${product.brand}">
+                    <input type="text" id="editProductBrand" required value="${escapeHtml(product.brand)}">
                 </div>
                 <div class="form-group">
                     <label>类型 *</label>
@@ -217,27 +232,27 @@ const Admin = {
                 </div>
                 <div class="form-group">
                     <label>板长</label>
-                    <input type="text" id="editProductLength" value="${product.length}">
+                    <input type="text" id="editProductLength" value="${escapeHtml(product.length)}">
                 </div>
                 <div class="form-group">
                     <label>板宽</label>
-                    <input type="text" id="editProductWidth" value="${product.width}">
+                    <input type="text" id="editProductWidth" value="${escapeHtml(product.width)}">
                 </div>
                 <div class="form-group">
                     <label>硬度 (1-10)</label>
-                    <input type="number" id="editProductFlex" min="1" max="10" value="${product.flex}">
+                    <input type="number" id="editProductFlex" min="1" max="10" value="${escapeHtml(String(product.flex))}">
                 </div>
                 <div class="form-group">
                     <label>日租金 *</label>
-                    <input type="number" id="editProductPrice" required min="0" value="${product.price}">
+                    <input type="number" id="editProductPrice" required min="0" value="${escapeHtml(String(product.price))}">
                 </div>
                 <div class="form-group">
                     <label>押金</label>
-                    <input type="number" id="editProductDeposit" min="0" value="${product.deposit}">
+                    <input type="number" id="editProductDeposit" min="0" value="${escapeHtml(String(product.deposit))}">
                 </div>
                 <div class="form-group">
                     <label>库存数量</label>
-                    <input type="number" id="editProductStock" min="0" value="${product.stock}">
+                    <input type="number" id="editProductStock" min="0" value="${escapeHtml(String(product.stock))}">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">保存修改</button>
             </form>
@@ -340,19 +355,19 @@ const Admin = {
 
             return `
                 <tr>
-                    <td>${order.id}</td>
-                    <td>${order.userName}</td>
-                    <td>${firstItem.productName || '单板'}</td>
-                    <td>${App.formatDateDisplay(order.rentStartDate)} ~ ${App.formatDateDisplay(order.rentEndDate)}</td>
-                    <td>¥${order.total}</td>
+                    <td>${escapeHtml(order.id)}</td>
+                    <td>${escapeHtml(order.userName || order.user_name || '-')}</td>
+                    <td>${escapeHtml(firstItem.productName || '单板')}</td>
+                    <td>${App.formatDateDisplay(order.start_date || order.rentStartDate)} ~ ${App.formatDateDisplay(order.end_date || order.rentEndDate)}</td>
+                    <td>¥${order.total_price || order.total}</td>
                     <td><span class="order-status ${statusClass}">${statusText}</span></td>
                     <td>
-                        <button class="action-btn view" onclick="Admin.viewOrderDetail('${order.id}')">查看</button>
+                        <button class="action-btn view" onclick="Admin.viewOrderDetail('${escapeHtml(order.id)}')">查看</button>
                         ${order.status === 'pending' ? `
-                            <button class="action-btn edit" onclick="Admin.updateOrderStatus('${order.id}', 'active')">确认取板</button>
+                            <button class="action-btn edit" onclick="Admin.updateOrderStatus('${escapeHtml(order.id)}', 'active')">确认取板</button>
                         ` : ''}
                         ${order.status === 'active' ? `
-                            <button class="action-btn edit" onclick="Admin.updateOrderStatus('${order.id}', 'completed')">确认归还</button>
+                            <button class="action-btn edit" onclick="Admin.updateOrderStatus('${escapeHtml(order.id)}', 'completed')">确认归还</button>
                         ` : ''}
                     </td>
                 </tr>
@@ -381,7 +396,7 @@ const Admin = {
 
         let itemsHTML = order.items.map(item => `
             <div class="item-row">
-                <span>${item.productName} × ${item.quantity}</span>
+                <span>${escapeHtml(item.productName)} × ${item.quantity}</span>
                 <span>¥${item.pricePerDay * order.rentDays}/天</span>
             </div>
         `).join('');
@@ -390,7 +405,7 @@ const Admin = {
             order.accessories.forEach(acc => {
                 itemsHTML += `
                     <div class="item-row">
-                        <span>${acc.name}</span>
+                        <span>${escapeHtml(acc.name)}</span>
                         <span>¥${acc.pricePerDay * acc.days}/天</span>
                     </div>
                 `;
@@ -398,7 +413,7 @@ const Admin = {
         }
 
         App.showModal(`
-            <h3>订单详情 - ${order.id}</h3>
+            <h3>订单详情 - ${escapeHtml(order.id)}</h3>
             <div class="order-confirm">
                 <div class="order-confirm-section">
                     <h4>📅 租赁信息</h4>
@@ -417,7 +432,7 @@ const Admin = {
                     ${order.deliveryAddress ? `
                         <div class="item-row">
                             <span>配送地址</span>
-                            <span>${order.deliveryAddress}</span>
+                            <span>${escapeHtml(order.deliveryAddress)}</span>
                         </div>
                     ` : ''}
                 </div>
@@ -431,16 +446,16 @@ const Admin = {
                     <h4>👤 客户信息</h4>
                     <div class="item-row">
                         <span>姓名</span>
-                        <span>${order.userName}</span>
+                        <span>${escapeHtml(order.userName || '-')}</span>
                     </div>
                     <div class="item-row">
                         <span>手机号</span>
-                        <span>${order.userPhone}</span>
+                        <span>${escapeHtml(order.userPhone || '-')}</span>
                     </div>
                     ${order.userIdCard ? `
                         <div class="item-row">
                             <span>身份证</span>
-                            <span>${order.userIdCard}</span>
+                            <span>${escapeHtml(order.userIdCard)}</span>
                         </div>
                     ` : ''}
                 </div>
@@ -464,7 +479,7 @@ const Admin = {
                 ${order.remarks ? `
                     <div class="order-confirm-section">
                         <h4>📝 备注</h4>
-                        <p>${order.remarks}</p>
+                        <p>${escapeHtml(order.remarks)}</p>
                     </div>
                 ` : ''}
             </div>
@@ -500,9 +515,9 @@ const Admin = {
             const userOrders = orders.filter(o => o.userPhone === user.phone);
             return `
                 <tr>
-                    <td>${user.id}</td>
-                    <td>${user.name}</td>
-                    <td>${user.phone}</td>
+                    <td>${escapeHtml(user.id)}</td>
+                    <td>${escapeHtml(user.name)}</td>
+                    <td>${escapeHtml(user.phone)}</td>
                     <td>${userOrders.length} 单</td>
                     <td>${user.createdAt ? App.formatDateDisplay(user.createdAt) : '-'}</td>
                 </tr>

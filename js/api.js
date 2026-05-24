@@ -7,6 +7,33 @@ import { supabase } from './supabase-client.js';
 import { getCurrentUser } from './auth.js';
 
 /**
+ * HTML 转义，防止 XSS
+ * @param {string} str
+ * @returns {string}
+ */
+export function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+}
+
+/**
+ * 字段白名单过滤（防 updateProduct/updateProfile 字段注入）
+ * @param {object} updates - 原始更新对象
+ * @param {string[]} allowed - 允许的字段列表
+ * @returns {object}
+ */
+export function sanitizeUpdates(updates, allowed) {
+    return Object.fromEntries(
+        Object.entries(updates).filter(([k]) => allowed.includes(k))
+    );
+}
+
+/**
  * 获取单板列表
  * @returns {Promise<Array>}
  */
@@ -109,7 +136,7 @@ export async function createOrder(orderData) {
 
         if (error) {
             console.error('创建订单失败:', error);
-            return { success: false, error: error.message };
+            return { success: false, error: '操作失败，请稍后重试' };
         }
 
         return { success: true, orderId: data.id };
@@ -179,18 +206,25 @@ export async function getAllOrders() {
  */
 export async function updateOrderStatus(orderId, status) {
     try {
+        const user = await getCurrentUser();
+        if (!user) return { success: false, error: '请先登录' };
+        const { data: order } = await supabase
+            .from('orders').select('user_id').eq('id', orderId).single();
+        if (order?.user_id && order.user_id !== user.id) {
+            return { success: false, error: '无权限操作此订单' };
+        }
         const { error } = await supabase
             .from('orders')
             .update({ status: status })
             .eq('id', orderId);
 
         if (error) {
-            return { success: false, error: error.message };
+            return { success: false, error: '操作失败，请稍后重试' };
         }
 
         return { success: true };
     } catch (err) {
-        return { success: false, error: '网络错误' };
+        return { success: false, error: '操作失败，请稍后重试' };
     }
 }
 
@@ -257,18 +291,20 @@ export async function getAllProducts() {
  */
 export async function updateProduct(productId, updates) {
     try {
+        const allowed = ['name','brand','type','length','width','flex','price','deposit','stock'];
+        const safeUpdates = sanitizeUpdates(updates, allowed);
         const { error } = await supabase
             .from('products')
-            .update(updates)
+            .update(safeUpdates)
             .eq('id', productId);
 
         if (error) {
-            return { success: false, error: error.message };
+            return { success: false, error: '操作失败，请稍后重试' };
         }
 
         return { success: true };
     } catch (err) {
-        return { success: false, error: '网络错误' };
+        return { success: false, error: '操作失败，请稍后重试' };
     }
 }
 
