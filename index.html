@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>冰雪之巅 - 专业单板租赁平台</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <span class="logo-icon">⛷️</span>
+                <span>冰雪之巅</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active" data-page="home">首页</a></li>
+                <li><a href="#products" class="nav-link" data-page="products">装备租赁</a></li>
+                <li><a href="#cart" class="nav-link" data-page="cart">购物车</a></li>
+                <li><a href="#orders" class="nav-link" data-page="orders">我的租赁</a></li>
+                <li><a href="#admin" class="nav-link" data-page="admin">管理面板</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="cart-btn" onclick="App.navigateTo('cart')">
+                    <span class="cart-icon">🛒</span>
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
+                <button class="mobile-menu-btn" onclick="App.toggleMobileMenu()">☰</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 页面容器 -->
+    <main id="app">
+        <!-- 首页 -->
+        <section id="page-home" class="page active">
+            <!-- 促销横幅 -->
+            <div class="hero-banner">
+                <div class="hero-content">
+                    <h1>🏂 冰雪之巅 畅滑无忧</h1>
+                    <p>专业单板装备租赁，让你的滑雪之旅更轻松</p>
+                    <button class="btn btn-primary btn-lg" onclick="App.navigateTo('products')">立即租装备</button>
+                </div>
+                <div class="hero-overlay"></div>
+            </div>
+
+            <!-- 热门单板 -->
+            <div class="section container">
+                <div class="section-header">
+                    <h2>🔥 热门单板</h2>
+                    <a href="#products" class="link-more" onclick="App.navigateTo('products')">查看全部 →</a>
+                </div>
+                <div class="product-grid" id="featuredProducts"></div>
+            </div>
+
+            <!-- 租赁套餐 -->
+            <div class="section container">
+                <div class="section-header">
+                    <h2>📦 租赁套餐</h2>
+                </div>
+                <div class="package-grid" id="packages">
+                    <div class="package-card" data-days="2">
+                        <div class="package-badge">2天套餐</div>
+                        <h3>周末畅滑</h3>
+                        <div class="package-price">
+                            <span class="price">¥298</span>
+                            <span class="original">¥596</span>
+                        </div>
+                        <ul class="package-features">
+                            <li>✅ 单板租赁 2天</li>
+                            <li>✅ 固定器配套</li>
+                            <li>✅ 基础保养</li>
+                        </ul>
+                        <button class="btn btn-outline" onclick="App.selectPackage(2)">选择套餐</button>
+                    </div>
+                    <div class="package-card" data-days="3">
+                        <div class="package-badge">3天套餐</div>
+                        <h3>短途之旅</h3>
+                        <div class="package-price">
+                            <span class="price">¥418</span>
+                            <span class="original">¥894</span>
+                        </div>
+                        <ul class="package-features">
+                            <li>✅ 单板租赁 3天</li>
+                            <li>✅ 固定器配套</li>
+                            <li>✅ 雪具包租用</li>
+                        </ul>
+                        <button class="btn btn-outline" onclick="App.selectPackage(3)">选择套餐</button>
+                    </div>
+                    <div class="package-card popular" data-days="5">
+                        <div class="package-badge hot">最划算</div>
+                        <h3>深度体验</h3>
+                        <div class="package-price">
+                            <span class="price">¥648</span>
+                            <span class="original">¥1490</span>
+                        </div>
+                        <ul class="package-features">
+                            <li>✅ 单板租赁 5天</li>
+                            <li>✅ 固定器配套</li>
+                            <li>✅ 全套装备</li>
+                            <li>✅ 免费更换</li>
+                        </ul>
+                        <button class="btn btn-primary" onclick="App.selectPackage(5)">选择套餐</button>
+                    </div>
+                    <div class="package-card" data-days="7">
+                        <div class="package-badge">7天套餐</div>
+                        <h3>度假首选</h3>
+                        <div class="package-price">
+                            <span class="price">¥898</span>
+                            <span class="original">¥2093</span>
+                        </div>
+                        <ul class="package-features">
+                            <li>✅ 单板租赁 7天</li>
+                            <li>✅ 固定器配套</li>
+                            <li>✅ 全套装备</li>
+                            <li>✅ VIP优先</li>
+                        </ul>
+                        <button class="btn btn-outline" onclick="App.selectPackage(7)">选择套餐</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 为什么选择我们 -->
+            <div class="section section-dark container">
+                <div class="section-header">
+                    <h2>✨ 为什么选择冰雪之巅</h2>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🏆</div>
+                        <h3>专业品质</h3>
+                        <p>精选国际知名品牌装备，定期维护保养</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🚚</div>
+                        <h3>便捷配送</h3>
+                        <p>雪场直送，支持多地网点自提</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💰</div>
+                        <h3>价格实惠</h3>
+                        <p>灵活套餐组合，押金可退</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🛡️</div>
+                        <h3>安全保障</h3>
+                        <p>装备损坏险，意外保障</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 产品列表页 -->
+        <section id="page-products" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h1>🏂 装备租赁</h1>
+                </div>
+                <div class="products-layout">
+                    <!-- 筛选侧边栏 -->
+                    <aside class="filter-sidebar">
+                        <div class="filter-group">
+                            <h3>单板类型</h3>
+                            <div class="filter-options">
+                                <label class="filter-option">
+                                    <input type="checkbox" name="type" value="all" checked onchange="ProductFilter.apply()">
+                                    <span>全部</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="type" value="all-mountain" onchange="ProductFilter.apply()">
+                                    <span>全能板</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="type" value="freestyle" onchange="ProductFilter.apply()">
+                                    <span>公园板</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="type" value="freeride" onchange="ProductFilter.apply()">
+                                    <span>高山板</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="type" value="women" onchange="ProductFilter.apply()">
+                                    <span>女子板</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <h3>价格区间</h3>
+                            <div class="price-range">
+                                <input type="number" id="minPrice" placeholder="最低" min="0" onchange="ProductFilter.apply()">
+                                <span>-</span>
+                                <input type="number" id="maxPrice" placeholder="最高" min="0" onchange="ProductFilter.apply()">
+                                <span>元/天</span>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <h3>品牌</h3>
+                            <div class="filter-options" id="brandFilters"></div>
+                        </div>
+                        <button class="btn btn-outline btn-block" onclick="ProductFilter.reset()">重置筛选</button>
+                    </aside>
+
+                    <!-- 产品列表 -->
+                    <div class="products-main">
+                        <div class="products-toolbar">
+                            <div class="results-count">
+                                共 <span id="productCount">0</span> 件商品
+                            </div>
+                            <div class="sort-select">
+                                <label>排序：</label>
+                                <select id="sortSelect" onchange="ProductFilter.apply()">
+                                    <option value="default">默认排序</option>
+                                    <option value="price-asc">价格从低到高</option>
+                                    <option value="price-desc">价格从高到低</option>
+                                    <option value="sales-desc">销量优先</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="product-grid" id="productList"></div>
+                        <div class="pagination" id="pagination"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 产品详情页 -->
+        <section id="page-product-detail" class="page">
+            <div class="container">
+                <button class="btn btn-text" onclick="App.navigateTo('products')">← 返回列表</button>
+                <div class="product-detail" id="productDetail"></div>
+            </div>
+        </section>
+
+        <!-- 购物车页 -->
+        <section id="page-cart" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h1>🛒 购物车</h1>
+                </div>
+                <div class="cart-layout">
+                    <div class="cart-items" id="cartItems"></div>
+                    <div class="cart-summary" id="cartSummary">
+                        <h3>费用明细</h3>
+                        <div class="summary-row">
+                            <span>单板租金</span>
+                            <span id="cartBoardTotal">¥0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>配件租金</span>
+                            <span id="cartAccessoryTotal">¥0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>租期</span>
+                            <span id="cartDays">0天</span>
+                        </div>
+                        <div class="summary-row discount">
+                            <span>套餐优惠</span>
+                            <span id="cartDiscount">-¥0</span>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-row total">
+                            <span>预估总额</span>
+                            <span id="cartTotal">¥0</span>
+                        </div>
+                        <div class="summary-row deposit">
+                            <span>押金（可退）</span>
+                            <span id="cartDeposit">¥0</span>
+                        </div>
+                        <button class="btn btn-primary btn-block" onclick="App.navigateTo('checkout')" id="checkoutBtn">去结算</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 订单流程页 -->
+        <section id="page-checkout" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h1>📝 填写订单</h1>
+                </div>
+                <div class="checkout-steps">
+                    <div class="step active" data-step="1">
+                        <span class="step-num">1</span>
+                        <span class="step-text">选择日期</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="2">
+                        <span class="step-num">2</span>
+                        <span class="step-text">配件选择</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="3">
+                        <span class="step-num">3</span>
+                        <span class="step-text">个人信息</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="4">
+                        <span class="step-num">4</span>
+                        <span class="step-text">确认订单</span>
+                    </div>
+                </div>
+
+                <!-- 步骤1：日期选择 -->
+                <div class="checkout-panel" id="checkout-step-1">
+                    <h3>选择租赁日期</h3>
+                    <div class="date-picker">
+                        <div class="date-input-group">
+                            <label>开始日期</label>
+                            <input type="date" id="rentStartDate" onchange="OrderFlow.updateDays()">
+                        </div>
+                        <div class="date-input-group">
+                            <label>结束日期</label>
+                            <input type="date" id="rentEndDate" onchange="OrderFlow.updateDays()">
+                        </div>
+                        <div class="days-display">
+                            <span>租赁天数：</span>
+                            <strong id="selectedDays">0</strong>
+                            <span>天</span>
+                        </div>
+                    </div>
+                    <div class="price-calendar" id="priceCalendar"></div>
+                </div>
+
+                <!-- 步骤2：配件选择 -->
+                <div class="checkout-panel" id="checkout-step-2">
+                    <h3>选择配件</h3>
+                    <div class="accessory-list" id="accessoryList"></div>
+                </div>
+
+                <!-- 步骤3：个人信息 -->
+                <div class="checkout-panel" id="checkout-step-3">
+                    <h3>填写个人信息</h3>
+                    <form class="form" id="personalForm">
+                        <div class="form-group">
+                            <label>姓名 *</label>
+                            <input type="text" id="userName" required placeholder="请输入姓名">
+                        </div>
+                        <div class="form-group">
+                            <label>手机号 *</label>
+                            <input type="tel" id="userPhone" required placeholder="请输入手机号" pattern="[0-9]{11}">
+                        </div>
+                        <div class="form-group">
+                            <label>身份证号</label>
+                            <input type="text" id="userIdCard" placeholder="用于押金验证">
+                        </div>
+                        <div class="form-group">
+                            <label>取板方式</label>
+                            <select id="pickupType">
+                                <option value="store">门店自取</option>
+                                <option value="delivery">雪场直送（需加¥50）</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="deliveryAddressGroup" style="display:none;">
+                            <label>配送地址</label>
+                            <input type="text" id="deliveryAddress" placeholder="请输入配送地址">
+                        </div>
+                        <div class="form-group">
+                            <label>备注</label>
+                            <textarea id="userRemarks" rows="3" placeholder="特殊需求请备注"></textarea>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 步骤4：确认订单 -->
+                <div class="checkout-panel" id="checkout-step-4">
+                    <h3>确认订单信息</h3>
+                    <div class="order-confirm" id="orderConfirm"></div>
+                    <div class="agreement">
+                        <label>
+                            <input type="checkbox" id="agreeTerms" checked>
+                            <span>我已阅读并同意 <a href="#" onclick="showTerms()">《租赁协议》</a></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="checkout-actions">
+                    <button class="btn btn-outline" id="prevStepBtn" onclick="OrderFlow.prevStep()" style="display:none;">上一步</button>
+                    <button class="btn btn-primary" id="nextStepBtn" onclick="OrderFlow.nextStep()">下一步</button>
+                    <button class="btn btn-primary" id="submitOrderBtn" onclick="OrderFlow.submitOrder()" style="display:none;">提交订单</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 我的租赁页 -->
+        <section id="page-orders" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h1>📋 我的租赁</h1>
+                </div>
+                <div class="orders-tabs">
+                    <button class="tab-btn active" data-status="all" onclick="OrderHistory.filter('all')">全部订单</button>
+                    <button class="tab-btn" data-status="pending" onclick="OrderHistory.filter('pending')">待取板</button>
+                    <button class="tab-btn" data-status="active" onclick="OrderHistory.filter('active')">租赁中</button>
+                    <button class="tab-btn" data-status="completed" onclick="OrderHistory.filter('completed')">已归还</button>
+                </div>
+                <div class="orders-list" id="ordersList"></div>
+            </div>
+        </section>
+
+        <!-- 管理员面板 -->
+        <section id="page-admin" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h1>⚙️ 管理面板</h1>
+                </div>
+                <div class="admin-tabs">
+                    <button class="tab-btn active" data-admin-tab="inventory" onclick="Admin.switchTab('inventory')">库存管理</button>
+                    <button class="tab-btn" data-admin-tab="orders" onclick="Admin.switchTab('orders')">订单管理</button>
+                    <button class="tab-btn" data-admin-tab="users" onclick="Admin.switchTab('users')">用户管理</button>
+                </div>
+
+                <!-- 库存管理 -->
+                <div class="admin-panel" id="admin-inventory">
+                    <div class="admin-toolbar">
+                        <button class="btn btn-primary" onclick="Admin.showAddProduct()">添加单板</button>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>编号</th>
+                                <th>名称</th>
+                                <th>类型</th>
+                                <th>品牌</th>
+                                <th>日租金</th>
+                                <th>库存</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTable"></tbody>
+                    </table>
+                </div>
+
+                <!-- 订单管理 -->
+                <div class="admin-panel" id="admin-orders" style="display:none;">
+                    <div class="admin-toolbar">
+                        <select id="adminOrderFilter" onchange="Admin.filterOrders()">
+                            <option value="all">全部订单</option>
+                            <option value="pending">待处理</option>
+                            <option value="active">进行中</option>
+                            <option value="completed">已完成</option>
+                        </select>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>订单号</th>
+                                <th>用户</th>
+                                <th>单板</th>
+                                <th>租期</th>
+                                <th>金额</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTable"></tbody>
+                    </table>
+                </div>
+
+                <!-- 用户管理 -->
+                <div class="admin-panel" id="admin-users" style="display:none;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>用户ID</th>
+                                <th>姓名</th>
+                                <th>手机号</th>
+                                <th>订单数</th>
+                                <th>注册时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 底部 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>关于我们</h4>
+                    <p>冰雪之巅是专业的单板租赁平台，为滑雪爱好者提供高品质装备租赁服务。</p>
+                </div>
+                <div class="footer-section">
+                    <h4>联系方式</h4>
+                    <p>📞 400-888-6666</p>
+                    <p>📧 info@snowboard.cn</p>
+                </div>
+                <div class="footer-section">
+                    <h4>服务保障</h4>
+                    <p>正品保障 | 极速退款 | 售后无忧</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 冰雪之巅 Snowboard Rental. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 模态框 -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="App.closeModal()">×</span>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast">
+        <span class="toast-message" id="toastMessage"></span>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/order.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
