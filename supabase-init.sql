@@ -65,10 +65,10 @@ ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public can read products" ON products FOR SELECT USING (true);
 CREATE POLICY "Public can read accessories" ON accessories FOR SELECT USING (true);
 
--- 订单：允许公开读写（前端通过手机号或本地存储追踪游客订单）
-CREATE POLICY "Public can view orders" ON orders FOR SELECT USING (true);
+-- 订单：登录用户只能查自己的订单，公开插入（游客可下单），但只能更新自己的
+CREATE POLICY "Users can view own orders" ON orders FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Public can insert orders" ON orders FOR INSERT WITH CHECK (true);
-CREATE POLICY "Public can update orders" ON orders FOR UPDATE USING (true);
+CREATE POLICY "Users can update own orders" ON orders FOR UPDATE USING (auth.uid() = user_id);
 
 -- 用户信息：用户只能操作自己的
 CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
