@@ -3,6 +3,8 @@
  * 负责页面导航、路由、UI交互等核心功能
  */
 
+import { login, register, logout, getCurrentUser, onAuthStateChange } from './auth.js';
+
 const App = {
     // 当前页面
     currentPage: 'home',
@@ -20,6 +22,86 @@ const App = {
         this.renderFeaturedProducts();
         this.setupEventListeners();
         this.initDatePicker();
+        this.initAuth();
+    },
+
+    /**
+     * 初始化认证状态
+     */
+    async initAuth() {
+        // 检查登录状态
+        const user = await getCurrentUser();
+        if (user) {
+            this.updateAuthUI(user);
+        }
+
+        // 监听认证状态变化
+        onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' && session?.user) {
+                this.updateAuthUI(session.user);
+                App.showToast('登录成功');
+            } else if (event === 'SIGNED_OUT') {
+                this.updateAuthUI(null);
+                App.showToast('已退出登录');
+            }
+        });
+    },
+
+    /**
+     * 更新认证相关UI
+     */
+    updateAuthUI(user) {
+        const navActions = document.querySelector('.nav-actions');
+        if (!navActions) return;
+
+        // 移除现有登录/用户菜单
+        const existingAuth = navActions.querySelector('.auth-buttons');
+        if (existingAuth) {
+            existingAuth.remove();
+        }
+
+        if (user) {
+            // 显示用户菜单
+            navActions.insertAdjacentHTML('beforeend', `
+                <div class="auth-buttons">
+                    <button class="user-menu-btn" onclick="App.toggleUserMenu()">
+                        <span class="user-icon">👤</span>
+                        <span class="user-name">${user.email?.split('@')[0] || '用户'}</span>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <button onclick="App.navigateTo('orders')">📋 我的订单</button>
+                        <button onclick="Auth.logout(); App.closeUserMenu();">🚪 退出登录</button>
+                    </div>
+                </div>
+            `);
+        } else {
+            // 显示登录按钮
+            navActions.insertAdjacentHTML('beforeend', `
+                <div class="auth-buttons">
+                    <button class="login-btn" onclick="Auth.showModal()">登录</button>
+                </div>
+            `);
+        }
+    },
+
+    /**
+     * 切换用户菜单
+     */
+    toggleUserMenu() {
+        const dropdown = document.getElementById('userDropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('show');
+        }
+    },
+
+    /**
+     * 关闭用户菜单
+     */
+    closeUserMenu() {
+        const dropdown = document.getElementById('userDropdown');
+        if (dropdown) {
+            dropdown.classList.remove('show');
+        }
     },
 
     /**
@@ -625,3 +707,108 @@ function showTerms() {
         <button class="btn btn-primary btn-block mt-20" onclick="App.closeModal()">我已阅读</button>
     `);
 }
+
+/**
+ * 认证模块 - 与 app.js 集成
+ */
+const Auth = {
+    /**
+     * 显示登录/注册模态框
+     */
+    showModal() {
+        const modal = document.getElementById('authModal');
+        if (modal) {
+            modal.classList.add('show');
+        }
+    },
+
+    /**
+     * 关闭模态框
+     */
+    closeModal() {
+        const modal = document.getElementById('authModal');
+        if (modal) {
+            modal.classList.remove('show');
+        }
+        // 清空表单
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+        document.getElementById('regName').value = '';
+        document.getElementById('regPhone').value = '';
+        document.getElementById('regEmail').value = '';
+        document.getElementById('regPassword').value = '';
+    },
+
+    /**
+     * 切换登录/注册选项卡
+     */
+    switchTab(tab) {
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const tabs = document.querySelectorAll('.auth-tab');
+
+        tabs.forEach(t => t.classList.remove('active'));
+        document.querySelector(`.auth-tab[data-tab="${tab}"]`)?.classList.add('active');
+
+        if (tab === 'login') {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        } else {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        }
+    },
+
+    /**
+     * 用户登录
+     */
+    async login() {
+        const email = document.getElementById('loginEmail')?.value.trim();
+        const password = document.getElementById('loginPassword')?.value;
+
+        if (!email || !password) {
+            App.showToast('请输入邮箱和密码', 'error');
+            return;
+        }
+
+        const result = await login(email, password);
+        if (result.success) {
+            this.closeModal();
+        } else {
+            App.showToast(result.error || '登录失败', 'error');
+        }
+    },
+
+    /**
+     * 用户注册
+     */
+    async register() {
+        const name = document.getElementById('regName')?.value.trim();
+        const phone = document.getElementById('regPhone')?.value.trim();
+        const email = document.getElementById('regEmail')?.value.trim();
+        const password = document.getElementById('regPassword')?.value;
+
+        if (!name || !phone || !email || !password) {
+            App.showToast('请填写所有必填项', 'error');
+            return;
+        }
+
+        if (!/^1[3-9]\d{9}$/.test(phone)) {
+            App.showToast('请输入正确的手机号', 'error');
+            return;
+        }
+
+        if (password.length < 6) {
+            App.showToast('密码至少6位', 'error');
+            return;
+        }
+
+        const result = await register(email, password, name, phone);
+        if (result.success) {
+            App.showToast('注册成功');
+            this.closeModal();
+        } else {
+            App.showToast(result.error || '注册失败', 'error');
+        }
+    }
+};

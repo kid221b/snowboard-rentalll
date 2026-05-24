@@ -1480,6 +1480,167 @@ ul {
 }
 
 /* ===================================
+   登录/注册模态框
+   =================================== */
+.auth-modal-content {
+    max-width: 420px;
+    padding: 0;
+}
+
+.auth-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 16px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--bg-color);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.auth-tab:first-child {
+    border-radius: var(--radius-lg) 0 0 0;
+}
+
+.auth-tab:last-child {
+    border-radius: 0 var(--radius-lg) 0 0;
+}
+
+.auth-tab.active {
+    color: var(--primary-color);
+    background: var(--bg-white);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.auth-form-container {
+    padding: 30px;
+}
+
+.auth-form .form-group {
+    margin-bottom: 16px;
+}
+
+.auth-form .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.auth-form .form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.auth-form .form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 16px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.auth-switch a {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+/* ===================================
+   用户菜单
+   =================================== */
+.auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.login-btn {
+    padding: 8px 16px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.login-btn:hover {
+    background: var(--primary-dark);
+}
+
+.user-menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.user-menu-btn:hover {
+    background: var(--border-color);
+}
+
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    min-width: 160px;
+    display: none;
+    z-index: 100;
+}
+
+.user-dropdown.show {
+    display: block;
+}
+
+.user-dropdown button {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    text-align: left;
+    border: none;
+    background: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.user-dropdown button:hover {
+    background: var(--bg-color);
+}
+
+/* ===================================
    Toast
    =================================== */
 .toast {

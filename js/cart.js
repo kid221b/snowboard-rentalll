@@ -3,6 +3,8 @@
  * 负责购物车操作、价格计算、套餐处理
  */
 
+import { getAccessories } from './api.js';
+
 const Cart = {
     // 购物车数据
     items: [],
@@ -348,6 +350,18 @@ const Cart = {
         });
 
         return total;
+    },
+
+    /**
+     * 从 Supabase 加载配件数据
+     */
+    async loadAccessoriesFromSupabase() {
+        const accessories = await getAccessories();
+        if (accessories.length > 0) {
+            // 保存到本地以便离线使用
+            SnowboardData.saveAccessories(accessories);
+        }
+        return accessories;
     }
 };
 
