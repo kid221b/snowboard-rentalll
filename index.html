@@ -45,6 +45,20 @@
                 <div class="hero-overlay"></div>
             </div>
 
+            <!-- 智能推荐入口 -->
+            <div class="section container">
+                <div class="recommend-cta">
+                    <div class="recommend-cta-content">
+                        <div class="recommend-cta-icon">🎯</div>
+                        <h2>不知道选什么板？</h2>
+                        <p>3 个问题，AI 帮你找到最适合的单板 + 推荐板长</p>
+                    </div>
+                    <button class="btn btn-primary btn-lg" onclick="RecommendationWizard.show()">
+                        开始智能推荐 →
+                    </button>
+                </div>
+            </div>
+
             <!-- 热门单板 -->
             <div class="section container">
                 <div class="section-header">
@@ -203,6 +217,15 @@
 
                     <!-- 产品列表 -->
                     <div class="products-main">
+                        <div class="products-tabs">
+                            <button class="tab-btn active" data-tab="all" onclick="ProductFilter.switchTab('all', this)">全部</button>
+                            <button class="tab-btn" data-tab="recommended" onclick="ProductFilter.switchTab('recommended', this)">
+                                <span>✨</span> 为你推荐
+                                <span class="tab-hint" id="recommendedHint" style="display:none;">已登录</span>
+                            </button>
+                            <button class="tab-btn" data-tab="hot" onclick="ProductFilter.switchTab('hot', this)">🔥 热门</button>
+                            <button class="tab-btn" data-tab="suitable" onclick="ProductFilter.switchTab('suitable', this)">🎯 合适尺寸</button>
+                        </div>
                         <div class="products-toolbar">
                             <div class="results-count">
                                 共 <span id="productCount">0</span> 件商品
@@ -214,6 +237,7 @@
                                     <option value="price-asc">价格从低到高</option>
                                     <option value="price-desc">价格从高到低</option>
                                     <option value="sales-desc">销量优先</option>
+                                    <option value="rating-desc">好评优先</option>
                                 </select>
                             </div>
                         </div>
@@ -573,5 +597,6 @@
     <script type="module" src="js/cart.js?v=2"></script>
     <script type="module" src="js/order.js?v=2"></script>
     <script src="js/admin.js?v=2"></script>
+    <script src="js/recommendation.js?v=1"></script>
 </body>
 </html>

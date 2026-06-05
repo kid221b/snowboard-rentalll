@@ -28,7 +28,18 @@ const SnowboardData = {
             sales: 156,
             featured: true,
             images: ['🏂', '❄️', '⛷️'],
-            description: 'Burton旗舰款全能板，采用碳纤维增强技术，提供卓越的操控性和响应速度。适合有一定基础的滑雪者。'
+            description: 'Burton旗舰款全能板，采用碳纤维增强技术，提供卓越的操控性和响应速度。适合有一定基础的滑雪者。',
+            // ===== 推荐元数据 =====
+            skillLevel: ['intermediate', 'advanced'],
+            terrain: ['groomed', 'park', 'powder'],
+            heightRange: [165, 180],
+            weightRange: [60, 80],
+            bootSize: [40, 44],
+            shape: 'directional',
+            camber: 'hybrid',
+            features: ['旗舰碳纤维', '高速稳定', '全能表现'],
+            bestFor: '想要一板走天下、追求品质的进阶级玩家',
+            rating: 4.8
         },
         {
             id: 'sb002',
@@ -44,7 +55,17 @@ const SnowboardData = {
             sales: 89,
             featured: true,
             images: ['🏂', '❄️'],
-            description: '法国品牌经典全能板，拥有出色的稳定性和容错率，是入门到进阶的理想选择。'
+            description: '法国品牌经典全能板，拥有出色的稳定性和容错率，是入门到进阶的理想选择。',
+            skillLevel: ['beginner', 'intermediate'],
+            terrain: ['groomed', 'park'],
+            heightRange: [160, 175],
+            weightRange: [55, 75],
+            bootSize: [38, 42],
+            shape: 'twin',
+            camber: 'flat',
+            features: ['容错率高', '稳定性强', '新手友好'],
+            bestFor: '初学者和想稳步进阶的玩家',
+            rating: 4.6
         },
         {
             id: 'sb003',
@@ -60,7 +81,17 @@ const SnowboardData = {
             sales: 67,
             featured: true,
             images: ['🏔️', '❄️'],
-            description: '专为深粉雪设计，超宽板腰提供更大的浮力。锥形外形设计让这款板子在野雪中如鱼得水。'
+            description: '专为深粉雪设计，超宽板腰提供更大的浮力。锥形外形设计让这款板子在野雪中如鱼得水。',
+            skillLevel: ['advanced', 'expert'],
+            terrain: ['powder', 'backcountry'],
+            heightRange: [170, 185],
+            weightRange: [65, 90],
+            bootSize: [42, 46],
+            shape: 'directional',
+            camber: 'camber',
+            features: ['专业粉雪', '环保材料', '极致浮力'],
+            bestFor: '深粉雪和野雪爱好者',
+            rating: 4.9
         },
         {
             id: 'sb004',
@@ -76,7 +107,17 @@ const SnowboardData = {
             sales: 112,
             featured: false,
             images: ['🎪', '❄️'],
-            description: '经典的公园板，拥有均衡的弹性配置，适合各种公园道具和跳台动作。'
+            description: '经典的公园板，拥有均衡的弹性配置，适合各种公园道具和跳台动作。',
+            skillLevel: ['intermediate', 'advanced'],
+            terrain: ['park', 'groomed'],
+            heightRange: [160, 178],
+            weightRange: [55, 80],
+            bootSize: [38, 43],
+            shape: 'twin',
+            camber: 'hybrid',
+            features: ['公园利器', '弹性均衡', '道具友好'],
+            bestFor: '喜欢玩公园、跳台的玩家',
+            rating: 4.7
         },
         {
             id: 'sb005',
@@ -92,7 +133,17 @@ const SnowboardData = {
             sales: 203,
             featured: true,
             images: ['👩', '❄️'],
-            description: '专为女性设计的公园板，轻量化设计配合柔和的弹性，让女性滑雪者更容易上手。'
+            description: '专为女性设计的公园板，轻量化设计配合柔和的弹性，让女性滑雪者更容易上手。',
+            skillLevel: ['beginner', 'intermediate'],
+            terrain: ['park', 'groomed'],
+            heightRange: [148, 168],
+            weightRange: [40, 65],
+            bootSize: [35, 40],
+            shape: 'twin',
+            camber: 'hybrid',
+            features: ['女士专用', '轻量设计', '易上手'],
+            bestFor: '初学滑雪的女性玩家',
+            rating: 4.8
         },
         {
             id: 'sb006',
@@ -108,11 +159,21 @@ const SnowboardData = {
             sales: 54,
             featured: false,
             images: ['🏔️', '❄️'],
-            description: '网红爆款高山板，超弹的板腰设计配合双向 rocker，在粉雪中表现卓越。'
+            description: '网红爆款高山板，超弹的板腰设计配合双向 rocker，在粉雪中表现卓越。',
+            skillLevel: ['intermediate', 'advanced'],
+            terrain: ['powder', 'groomed'],
+            heightRange: [165, 182],
+            weightRange: [60, 85],
+            bootSize: [40, 44],
+            shape: 'directional',
+            camber: 'hybrid',
+            features: ['网红爆款', '双向 rocker', '粉雪利器'],
+            bestFor: '想尝试高山粉雪的中高级玩家',
+            rating: 4.7
         },
         {
             id: 'sb007',
-            name: 'Arbor Cask',
+            name: 'Arbor Coda',
             brand: 'Arbor',
             type: 'freeride',
             length: '161cm',
@@ -124,7 +185,17 @@ const SnowboardData = {
             sales: 38,
             featured: false,
             images: ['🏔️', '❄️'],
-            description: '采用环保材料制作的高山板，宽板腰设计配合锥形尾部，是探索野雪的利器。'
+            description: '采用环保材料制作的高山板，宽板腰设计配合锥形尾部，是探索野雪的利器。',
+            skillLevel: ['advanced'],
+            terrain: ['powder', 'backcountry'],
+            heightRange: [168, 185],
+            weightRange: [65, 90],
+            bootSize: [41, 45],
+            shape: 'directional',
+            camber: 'camber',
+            features: ['环保材料', '宽板腰', '野雪利器'],
+            bestFor: '热爱野雪探险的资深玩家',
+            rating: 4.6
         },
         {
             id: 'sb008',
@@ -140,7 +211,17 @@ const SnowboardData = {
             sales: 97,
             featured: false,
             images: ['🎪', '❄️'],
-            description: '经典公园板的进化版，加入了 tip and tail rocker，让玩家在公园中更加自由。'
+            description: '经典公园板的进化版，加入了 tip and tail rocker，让玩家在公园中更加自由。',
+            skillLevel: ['beginner', 'intermediate'],
+            terrain: ['park', 'groomed'],
+            heightRange: [158, 175],
+            weightRange: [50, 75],
+            bootSize: [38, 42],
+            shape: 'twin',
+            camber: 'rocker',
+            features: ['公园进化', '双向 rocker', '自由灵活'],
+            bestFor: '新手公园玩家',
+            rating: 4.5
         },
         {
             id: 'sb009',
@@ -156,7 +237,17 @@ const SnowboardData = {
             sales: 125,
             featured: false,
             images: ['🏂', '❄️'],
-            description: '独特的3BT技术让这块板子拥有出色的刃抓能力，同时保持良好的漂浮性。'
+            description: '独特的3BT技术让这块板子拥有出色的刃抓能力，同时保持良好的漂浮性。',
+            skillLevel: ['intermediate', 'advanced'],
+            terrain: ['groomed', 'powder'],
+            heightRange: [160, 178],
+            weightRange: [55, 80],
+            bootSize: [38, 43],
+            shape: 'twin',
+            camber: 'flat',
+            features: ['3BT 技术', '刃抓出色', '容错率高'],
+            bestFor: '想要全能又容错的玩家',
+            rating: 4.6
         },
         {
             id: 'sb010',
@@ -172,11 +263,21 @@ const SnowboardData = {
             sales: 178,
             featured: true,
             images: ['👩', '❄️'],
-            description: 'Roxy女士专属全能板，采用轻型玻璃纤维结构，专为亚洲女性脚型设计。'
+            description: 'Roxy女士专属全能板，采用轻型玻璃纤维结构，专为亚洲女性脚型设计。',
+            skillLevel: ['beginner', 'intermediate'],
+            terrain: ['groomed', 'park'],
+            heightRange: [150, 168],
+            weightRange: [42, 65],
+            bootSize: [35, 40],
+            shape: 'twin',
+            camber: 'flat',
+            features: ['亚洲女性脚型', '轻量玻璃纤维', '全能易上手'],
+            bestFor: '亚洲女性全场景玩家',
+            rating: 4.7
         },
         {
             id: 'sb011',
-            name: 'Salomo Sight',
+            name: 'Salomon Sight',
             brand: 'Salomon',
             type: 'all-mountain',
             length: '157cm',
@@ -188,11 +289,21 @@ const SnowboardData = {
             sales: 88,
             featured: false,
             images: ['🏂', '❄️'],
-            description: 'Salomon全能板力作，结合了公园的灵活性和高山板的稳定性，一板走天下。'
+            description: 'Salomon全能板力作，结合了公园的灵活性和高山板的稳定性，一板走天下。',
+            skillLevel: ['intermediate'],
+            terrain: ['groomed', 'park', 'powder'],
+            heightRange: [160, 178],
+            weightRange: [55, 80],
+            bootSize: [38, 43],
+            shape: 'twin-tip',
+            camber: 'hybrid',
+            features: ['一板走天下', '灵活稳定', '全场景适配'],
+            bestFor: '中级玩家的全能之选',
+            rating: 4.6
         },
         {
             id: 'sb012',
-            name: 'Yes Typo 童年',
+            name: 'Yes Typo',
             brand: 'Yes.',
             type: 'freestyle',
             length: '152cm',
@@ -204,8 +315,34 @@ const SnowboardData = {
             sales: 142,
             featured: false,
             images: ['🎪', '❄️'],
-            description: '设计灵感来自80年代的复古风格，性能却不复古，是公园入门玩家的绝佳选择。'
+            description: '设计灵感来自80年代的复古风格，性能却不复古，是公园入门玩家的绝佳选择。',
+            skillLevel: ['beginner', 'intermediate'],
+            terrain: ['park', 'groomed'],
+            heightRange: [155, 172],
+            weightRange: [48, 72],
+            bootSize: [37, 42],
+            shape: 'twin',
+            camber: 'rocker',
+            features: ['复古设计', '公园入门', '价格友好'],
+            bestFor: '入门级公园玩家',
+            rating: 4.5
         }
+    ],
+
+    // 技能等级选项
+    SKILL_LEVELS: [
+        { value: 'beginner', name: '新手', icon: '🌱', desc: '刚学会基本动作，能在初级道滑行' },
+        { value: 'intermediate', name: '初中级', icon: '⛷️', desc: '能在中级道顺畅滑行，学习各种技术' },
+        { value: 'advanced', name: '中高级', icon: '🏂', desc: '能在高级道流畅滑行，掌握各类地形' },
+        { value: 'expert', name: '专业', icon: '🏆', desc: '能驾驭任何地形，包括野雪和公园' }
+    ],
+
+    // 偏好地形选项
+    TERRAIN_OPTIONS: [
+        { value: 'groomed', name: '机压雪道', icon: '🎿', desc: '维护整齐的雪道，最常见的滑雪场景' },
+        { value: 'park', name: '公园', icon: '🎪', desc: '跳台、道具，玩花式动作' },
+        { value: 'powder', name: '粉雪', icon: '❄️', desc: '松软的未压雪，雪后初晴的完美体验' },
+        { value: 'backcountry', name: '野雪', icon: '🏔️', desc: '脱离雪道，深入自然' }
     ],
 
     // 配件数据（6种）

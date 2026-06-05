@@ -301,6 +301,59 @@ const App = {
         const typeConfig = SnowboardData.TYPE_CONFIG[product.type] || {};
         const container = document.getElementById('productDetail');
 
+        // 计算推荐理由
+        const profile = RecommendationState.load();
+        let recommendHtml = '';
+        if (profile) {
+            const rec = RecommendationEngine._scoreProduct(profile, product);
+            if (rec.score > 0) {
+                const scorePercent = Math.min(100, Math.round((rec.score + 50) / 2));
+                recommendHtml = `
+                    <div class="detail-recommendation">
+                        <div class="rec-header">
+                            <h3>🎯 为你推荐度</h3>
+                            <div class="rec-score-bar">
+                                <div class="rec-score-fill" style="width:${scorePercent}%"></div>
+                                <span class="rec-score-text">${scorePercent}% 匹配</span>
+                            </div>
+                        </div>
+                        <div class="rec-reasons-detail">
+                            ${rec.reasons.map(r => `<div class="rec-reason-item">${r}</div>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // 计算适配身高
+        const heightRangeHtml = product.heightRange
+            ? `<div class="spec-item">
+                 <div class="spec-label">适配身高</div>
+                 <div class="spec-value">${product.heightRange[0]}-${product.heightRange[1]} cm</div>
+               </div>
+               <div class="spec-item">
+                 <div class="spec-label">适配体重</div>
+                 <div class="spec-value">${product.weightRange[0]}-${product.weightRange[1]} kg</div>
+               </div>
+               <div class="spec-item">
+                 <div class="spec-label">适配尺码</div>
+                 <div class="spec-value">${product.bootSize[0]}-${product.bootSize[1]} 欧码</div>
+               </div>`
+            : '';
+
+        // 适合人群标签
+        const skillTags = (product.skillLevel || []).map(s => {
+            const level = SnowboardData.SKILL_LEVELS.find(l => l.value === s);
+            return level ? `<span class="skill-tag">${level.icon} ${level.name}</span>` : '';
+        }).join('');
+
+        const terrainTags = (product.terrain || []).map(t => {
+            const terrainOpt = SnowboardData.TERRAIN_OPTIONS.find(o => o.value === t);
+            return terrainOpt ? `<span class="terrain-tag">${terrainOpt.icon} ${terrainOpt.name}</span>` : '';
+        }).join('');
+
+        const featuresHtml = (product.features || []).map(f => `<span class="feature-tag">${f}</span>`).join('');
+
         container.innerHTML = `
             <div class="detail-images">
                 <div class="main-image">${product.images[0]}</div>
@@ -313,6 +366,7 @@ const App = {
             <div class="detail-info">
                 <h1>${product.name}</h1>
                 <p class="detail-brand">${typeConfig.icon || ''} ${typeConfig.name || product.type} | ${product.brand}</p>
+                ${product.rating ? `<p class="detail-rating">⭐ ${product.rating}/5 (${product.sales || 0} 次租赁)</p>` : ''}
 
                 <div class="detail-price-box">
                     <div class="detail-price">
@@ -320,6 +374,8 @@ const App = {
                     </div>
                     <p style="color: var(--text-secondary); font-size: 0.9rem;">押金 ¥${product.deposit}（可退）</p>
                 </div>
+
+                ${recommendHtml}
 
                 <div class="detail-specs">
                     <h3>📐 规格参数</h3>
@@ -336,11 +392,44 @@ const App = {
                             <div class="spec-label">硬度</div>
                             <div class="spec-value">${product.flex}/10</div>
                         </div>
+                        <div class="spec-item">
+                            <div class="spec-label">板型</div>
+                            <div class="spec-value">${this._shapeName(product.shape)}</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-label">板底</div>
+                            <div class="spec-value">${this._camberName(product.camber)}</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-label">库存</div>
+                            <div class="spec-value">${product.stock > 0 ? '✅ ' + product.stock + ' 件' : '❌ 缺货'}</div>
+                        </div>
+                        ${heightRangeHtml}
+                    </div>
+                </div>
+
+                ${featuresHtml ? `
+                <div class="detail-features">
+                    <h3>✨ 产品特点</h3>
+                    <div class="feature-tags">${featuresHtml}</div>
+                </div>
+                ` : ''}
+
+                <div class="detail-tags-section">
+                    <div class="detail-tags">
+                        <h4>🎯 适合水平</h4>
+                        <div class="tag-list">${skillTags}</div>
+                    </div>
+                    <div class="detail-tags">
+                        <h4>⛷️ 适合地形</h4>
+                        <div class="tag-list">${terrainTags}</div>
                     </div>
                 </div>
 
                 <div class="detail-description">
+                    <h3>📝 详细介绍</h3>
                     <p>${product.description}</p>
+                    ${product.bestFor ? `<p class="best-for"><strong>💡 最佳场景：</strong>${product.bestFor}</p>` : ''}
                 </div>
 
                 <div class="detail-actions">
@@ -355,6 +444,32 @@ const App = {
         `;
 
         this.navigateTo('product-detail');
+    },
+
+    /**
+     * 板型名称
+     */
+    _shapeName(shape) {
+        const map = {
+            'directional': '方向板',
+            'twin': '双向板',
+            'twin-tip': '双向板尖',
+            'directional-twin': '准双向'
+        };
+        return map[shape] || '-';
+    },
+
+    /**
+     * 板底名称
+     */
+    _camberName(camber) {
+        const map = {
+            'camber': '正拱',
+            'rocker': '反拱',
+            'flat': '平底',
+            'hybrid': '混合'
+        };
+        return map[camber] || '-';
     },
 
     /**
@@ -496,6 +611,7 @@ const ProductFilter = {
         brand: '',
         sort: 'default'
     },
+    activeTab: 'all',
     pageSize: 8,
     currentPage: 1,
 
@@ -503,8 +619,25 @@ const ProductFilter = {
      * 初始化筛选器
      */
     init() {
+        // 检查用户是否有推荐画像
+        const profile = RecommendationState.load();
+        if (profile) {
+            const hint = document.getElementById('recommendedHint');
+            if (hint) hint.style.display = 'inline';
+        }
         this.renderFilters();
         this.apply();
+    },
+
+    /**
+     * 切换 tab
+     */
+    switchTab(tab, el) {
+        this.activeTab = tab;
+        document.querySelectorAll('.products-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+        if (el) el.classList.add('active');
+        this.currentPage = 1;
+        this.render();
     },
 
     /**
@@ -603,8 +736,48 @@ const ProductFilter = {
 
         if (!container) return;
 
-        // 获取筛选后的产品
+        // 获取产品
         let products = SnowboardData.getProducts();
+
+        // Tab 排序
+        if (this.activeTab === 'recommended') {
+            const profile = RecommendationState.load();
+            if (profile) {
+                const recs = RecommendationEngine.recommend(profile, products);
+                products = recs.map(r => r.product);
+                // 在每个产品上挂载推荐理由
+                products.forEach(p => {
+                    const rec = recs.find(r => r.product.id === p.id);
+                    if (rec) p._recReasons = rec.reasons;
+                });
+            } else {
+                // 没填过问卷，引导去填
+                products = [];
+                container.innerHTML = `
+                    <div class="empty-recommendation">
+                        <div class="empty-icon">🎯</div>
+                        <h3>还没设置你的偏好</h3>
+                        <p>完成 3 个简单问题，获取个性化推荐</p>
+                        <button class="btn btn-primary" onclick="RecommendationWizard.show()">开始智能推荐</button>
+                    </div>
+                `;
+                if (countEl) countEl.textContent = '0';
+                if (paginationEl) paginationEl.innerHTML = '';
+                return;
+            }
+        } else if (this.activeTab === 'hot') {
+            products.sort((a, b) => (b.sales || 0) - (a.sales || 0));
+        } else if (this.activeTab === 'suitable') {
+            const profile = RecommendationState.load();
+            if (profile && profile.height) {
+                // 按身高筛选适配范围
+                products = products.filter(p =>
+                    p.heightRange && p.height >= p.heightRange[0] && p.height <= p.heightRange[1]
+                );
+            } else {
+                products.sort((a, b) => b.rating - a.rating);
+            }
+        }
 
         // 类型筛选
         if (this.filters.type !== 'all') {
@@ -625,16 +798,21 @@ const ProductFilter = {
         );
 
         // 排序
-        switch (this.filters.sort) {
-            case 'price-asc':
-                products.sort((a, b) => a.price - b.price);
-                break;
-            case 'price-desc':
-                products.sort((a, b) => b.price - a.price);
-                break;
-            case 'sales-desc':
-                products.sort((a, b) => b.sales - a.sales);
-                break;
+        if (this.activeTab !== 'recommended' && this.activeTab !== 'hot') {
+            switch (this.filters.sort) {
+                case 'price-asc':
+                    products.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-desc':
+                    products.sort((a, b) => b.price - a.price);
+                    break;
+                case 'sales-desc':
+                    products.sort((a, b) => b.sales - a.sales);
+                    break;
+                case 'rating-desc':
+                    products.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                    break;
+            }
         }
 
         // 更新总数
@@ -648,7 +826,7 @@ const ProductFilter = {
         const pageProducts = products.slice(start, start + this.pageSize);
 
         // 渲染产品卡片
-        container.innerHTML = pageProducts.map(product => App.createProductCard(product)).join('');
+        container.innerHTML = pageProducts.map(product => this._createProductCardWithRec(product)).join('');
 
         // 渲染分页
         if (paginationEl) {
@@ -667,6 +845,23 @@ const ProductFilter = {
                 paginationEl.innerHTML = paginationHTML;
             }
         }
+    },
+
+    /**
+     * 创建带推荐理由的产品卡片
+     */
+    _createProductCardWithRec(product) {
+        const baseCard = App.createProductCard(product);
+        if (!product._recReasons || product._recReasons.length === 0) {
+            return baseCard;
+        }
+        const reasonsHtml = product._recReasons.slice(0, 2).map(r =>
+            `<span class="rec-reason-tag">${r}</span>`
+        ).join('');
+        return baseCard.replace(
+            '<div class="product-info">',
+            `<div class="product-info">${reasonsHtml ? `<div class="product-reasons">${reasonsHtml}</div>` : ''}`
+        );
     },
 
     /**
