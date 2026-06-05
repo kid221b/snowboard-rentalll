@@ -3,6 +3,21 @@
  * 包含规则引擎推荐、板长计算、快速选板问卷
  */
 
+/**
+ * HTML 转义，防止 XSS
+ * @param {string} str
+ * @returns {string}
+ */
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+}
+
 // ============== 板长计算器 ==============
 const BoardSizeCalculator = {
     /**
@@ -14,11 +29,11 @@ const BoardSizeCalculator = {
      * @returns {number} 推荐板长 cm
      */
     calculate(height, weight, terrain = 'groomed') {
-        if (!height || height < 80 || height > 220) return 0;
+        if (!height || typeof height !== 'number' || !isFinite(height) || height < 80 || height > 220) return 0;
         let base = height;
 
-        // 体重调整
-        if (weight) {
+        // 体重调整（边界保护：仅当 weight 在合理范围时调整）
+        if (weight && typeof weight === 'number' && isFinite(weight) && weight > 0 && weight < 200) {
             if (weight > 85) base += 4;
             else if (weight > 75) base += 2;
             else if (weight < 55) base -= 3;
@@ -230,6 +245,8 @@ const RecommendationWizard = {
      * 打开推荐问卷弹窗
      */
     show() {
+        this.step = 1;
+        // 状态恢复：标记已选答案
         const step1 = `
             <h2 style="text-align: center; margin-bottom: 8px;">🏂 找到适合你的单板</h2>
             <p style="text-align: center; color: var(--text-secondary); margin-bottom: 24px;">回答 3 个简单问题，AI 帮你智能推荐</p>
@@ -244,16 +261,21 @@ const RecommendationWizard = {
                 <h3>你的滑雪水平是？</h3>
                 <div class="wizard-options" id="wizardSkillOptions">
                     ${SnowboardData.SKILL_LEVELS.map(s => `
-                        <div class="wizard-option" data-value="${s.value}" onclick="RecommendationWizard.selectSkill('${s.value}', this)">
-                            <div class="wizard-option-icon">${s.icon}</div>
-                            <div class="wizard-option-name">${s.name}</div>
-                            <div class="wizard-option-desc">${s.desc}</div>
+                        <div class="wizard-option" data-value="${escapeHtml(String(s.value))}" onclick="RecommendationWizard.selectSkill('${escapeHtml(String(s.value))}', this)">
+                            <div class="wizard-option-icon">${escapeHtml(String(s.icon))}</div>
+                            <div class="wizard-option-name">${escapeHtml(s.name)}</div>
+                            <div class="wizard-option-desc">${escapeHtml(s.desc)}</div>
                         </div>
                     `).join('')}
                 </div>
             </div>
         `;
         App.showModal(step1);
+        // 恢复已选
+        if (this.answers.skillLevel) {
+            const el = document.querySelector(`#wizardSkillOptions [data-value="${this.answers.skillLevel}"]`);
+            if (el) el.classList.add('selected');
+        }
     },
 
     selectSkill(value, el) {
@@ -303,20 +325,27 @@ const RecommendationWizard = {
                 <h3>你最想去哪种地形玩？<br><small style="color: var(--text-secondary); font-weight: 400;">（可多选）</small></h3>
                 <div class="wizard-options" id="wizardTerrainOptions">
                     ${SnowboardData.TERRAIN_OPTIONS.map(t => `
-                        <div class="wizard-option" data-value="${t.value}" onclick="RecommendationWizard.toggleTerrain('${t.value}', this)">
-                            <div class="wizard-option-icon">${t.icon}</div>
-                            <div class="wizard-option-name">${t.name}</div>
-                            <div class="wizard-option-desc">${t.desc}</div>
+                        <div class="wizard-option" data-value="${escapeHtml(String(t.value))}" onclick="RecommendationWizard.toggleTerrain('${escapeHtml(String(t.value))}', this)">
+                            <div class="wizard-option-icon">${escapeHtml(String(t.icon))}</div>
+                            <div class="wizard-option-name">${escapeHtml(t.name)}</div>
+                            <div class="wizard-option-desc">${escapeHtml(t.desc)}</div>
                         </div>
                     `).join('')}
                 </div>
             </div>
             <div class="wizard-actions">
                 <button class="btn btn-outline" onclick="RecommendationWizard.prev()">上一步</button>
-                <button class="btn btn-primary" onclick="RecommendationWizard.next()" id="wizardStep2Next" disabled>下一步</button>
+                <button class="btn btn-primary" onclick="RecommendationWizard.next()" id="wizardStep2Next" ${(this.answers.terrain && this.answers.terrain.length > 0) ? '' : 'disabled'}>下一步</button>
             </div>
         `;
         App.showModal(html);
+        // 恢复已选
+        if (this.answers.terrain) {
+            this.answers.terrain.forEach(v => {
+                const el = document.querySelector(`#wizardTerrainOptions [data-value="${v}"]`);
+                if (el) el.classList.add('selected');
+            });
+        }
     },
 
     toggleTerrain(value, el) {
@@ -389,15 +418,17 @@ const RecommendationWizard = {
      * 提交问卷，跳转到推荐结果
      */
     finish() {
-        const height = parseInt(document.getElementById('wizardHeight')?.value) || null;
-        const weight = parseInt(document.getElementById('wizardWeight')?.value) || null;
-        const bootSize = parseInt(document.getElementById('wizardBootSize')?.value) || null;
-
+        // 严格数值解析：parseFloat + 边界校验 + 拒绝 0/负数
+        const numOrNull = (id) => {
+            const el = document.getElementById(id);
+            const v = el ? parseFloat(el.value) : NaN;
+            return Number.isFinite(v) && v > 0 ? Math.round(v) : null;
+        };
         const profile = {
             ...this.answers,
-            height,
-            weight,
-            bootSize
+            height: numOrNull('wizardHeight'),
+            weight: numOrNull('wizardWeight'),
+            bootSize: numOrNull('wizardBootSize')
         };
 
         RecommendationState.save(profile);
@@ -429,14 +460,14 @@ const RecommendationWizard = {
         const html = `
             <h2 style="text-align: center; margin-bottom: 8px;">🎯 为你推荐</h2>
             <p style="text-align: center; color: var(--text-secondary); margin-bottom: 20px;">
-                基于 <strong>${skillName}</strong> · <strong>${terrainNames}</strong> 智能匹配
+                基于 <strong>${escapeHtml(skillName)}</strong> · <strong>${escapeHtml(terrainNames)}</strong> 智能匹配
             </p>
             ${sizeCalc ? `
                 <div class="size-recommendation">
                     <div class="size-recommendation-title">📏 推荐板长</div>
-                    <div class="size-recommendation-value">${sizeCalc.length} cm</div>
+                    <div class="size-recommendation-value">${escapeHtml(String(sizeCalc.length))} cm</div>
                     <div class="size-recommendation-reasons">
-                        ${sizeCalc.reasons.map(r => `<span class="size-reason">${r}</span>`).join('')}
+                        ${sizeCalc.reasons.map(r => `<span class="size-reason">${escapeHtml(r)}</span>`).join('')}
                     </div>
                 </div>
             ` : ''}
@@ -455,19 +486,19 @@ const RecommendationWizard = {
         const product = rec.product;
         const typeConfig = SnowboardData.TYPE_CONFIG[product.type] || {};
         return `
-            <div class="recommendation-card rank-${rank}" onclick="App.closeModal(); App.showProductDetail('${product.id}');">
+            <div class="recommendation-card rank-${rank}" onclick="App.closeModal(); App.showProductDetail('${escapeHtml(product.id)}');">
                 <div class="recommendation-rank">No.${rank}</div>
-                <div class="recommendation-image">${product.images[0]}</div>
+                <div class="recommendation-image">${escapeHtml(String(product.images?.[0] || '🏂'))}</div>
                 <div class="recommendation-info">
-                    <div class="recommendation-type">${typeConfig.icon || ''} ${typeConfig.name || product.type} · ${product.brand}</div>
-                    <div class="recommendation-name">${product.name}</div>
+                    <div class="recommendation-type">${escapeHtml(String(typeConfig.icon || ''))} ${escapeHtml(typeConfig.name || product.type)} · ${escapeHtml(product.brand)}</div>
+                    <div class="recommendation-name">${escapeHtml(product.name)}</div>
                     <div class="recommendation-reasons">
-                        ${rec.reasons.slice(0, 3).map(r => `<span class="rec-reason">${r}</span>`).join('')}
+                        ${rec.reasons.slice(0, 3).map(r => `<span class="rec-reason">${escapeHtml(r)}</span>`).join('')}
                     </div>
                     <div class="recommendation-meta">
-                        <span>📏 ${product.length}</span>
-                        <span>💪 硬度 ${product.flex}/10</span>
-                        <span class="recommendation-price">¥${product.price}/天</span>
+                        <span>📏 ${escapeHtml(String(product.length))}</span>
+                        <span>💪 硬度 ${escapeHtml(String(product.flex))}/10</span>
+                        <span class="recommendation-price">¥${escapeHtml(String(product.price))}/天</span>
                     </div>
                 </div>
             </div>

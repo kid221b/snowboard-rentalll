@@ -5,6 +5,21 @@
 
 import { login, register, logout, getCurrentUser, onAuthStateChange } from './auth.js';
 
+/**
+ * HTML 转义，防止 XSS
+ * @param {string} str
+ * @returns {string}
+ */
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+}
+
 const App = {
     // 当前页面
     currentPage: 'home',
@@ -264,24 +279,24 @@ const App = {
     createProductCard(product) {
         const typeConfig = SnowboardData.TYPE_CONFIG[product.type] || {};
         const stockStatus = product.stock > 0
-            ? `<span class="stock-ok">有货 (${product.stock})</span>`
+            ? `<span class="stock-ok">有货 (${escapeHtml(String(product.stock))})</span>`
             : '<span class="stock-out">缺货</span>';
 
         return `
-            <div class="product-card" onclick="App.showProductDetail('${product.id}')">
+            <div class="product-card" onclick="App.showProductDetail('${escapeHtml(product.id)}')">
                 <div class="product-image">
-                    ${product.images[0]}
+                    ${escapeHtml(String(product.images?.[0] || '🏂'))}
                     ${product.featured ? '<span class="product-badge">热门</span>' : ''}
                 </div>
                 <div class="product-info">
-                    <div class="product-type">${typeConfig.icon || ''} ${typeConfig.name || product.type}</div>
-                    <div class="product-name">${product.name}</div>
+                    <div class="product-type">${escapeHtml(typeConfig.icon || '')} ${escapeHtml(typeConfig.name || product.type)}</div>
+                    <div class="product-name">${escapeHtml(product.name)}</div>
                     <div class="product-meta">
-                        <span>${product.brand}</span>
+                        <span>${escapeHtml(product.brand)}</span>
                         ${stockStatus}
                     </div>
                     <div class="product-price">
-                        ¥${product.price}<span>/天</span>
+                        ¥${escapeHtml(String(product.price))}<span>/天</span>
                     </div>
                 </div>
             </div>
@@ -344,35 +359,35 @@ const App = {
         // 适合人群标签
         const skillTags = (product.skillLevel || []).map(s => {
             const level = SnowboardData.SKILL_LEVELS.find(l => l.value === s);
-            return level ? `<span class="skill-tag">${level.icon} ${level.name}</span>` : '';
+            return level ? `<span class="skill-tag">${escapeHtml(String(level.icon))} ${escapeHtml(level.name)}</span>` : '';
         }).join('');
 
         const terrainTags = (product.terrain || []).map(t => {
             const terrainOpt = SnowboardData.TERRAIN_OPTIONS.find(o => o.value === t);
-            return terrainOpt ? `<span class="terrain-tag">${terrainOpt.icon} ${terrainOpt.name}</span>` : '';
+            return terrainOpt ? `<span class="terrain-tag">${escapeHtml(String(terrainOpt.icon))} ${escapeHtml(terrainOpt.name)}</span>` : '';
         }).join('');
 
-        const featuresHtml = (product.features || []).map(f => `<span class="feature-tag">${f}</span>`).join('');
+        const featuresHtml = (product.features || []).map(f => `<span class="feature-tag">${escapeHtml(f)}</span>`).join('');
 
         container.innerHTML = `
             <div class="detail-images">
-                <div class="main-image">${product.images[0]}</div>
+                <div class="main-image">${escapeHtml(String(product.images?.[0] || '🏂'))}</div>
                 <div class="thumbnails">
-                    ${product.images.map((img, idx) => `
-                        <div class="thumbnail ${idx === 0 ? 'active' : ''}" onclick="App.switchImage(this, '${img}')">${img}</div>
+                    ${(product.images || []).map((img, idx) => `
+                        <div class="thumbnail ${idx === 0 ? 'active' : ''}" onclick="App.switchImage(this, '${escapeHtml(String(img))}')">${escapeHtml(String(img))}</div>
                     `).join('')}
                 </div>
             </div>
             <div class="detail-info">
-                <h1>${product.name}</h1>
-                <p class="detail-brand">${typeConfig.icon || ''} ${typeConfig.name || product.type} | ${product.brand}</p>
-                ${product.rating ? `<p class="detail-rating">⭐ ${product.rating}/5 (${product.sales || 0} 次租赁)</p>` : ''}
+                <h1>${escapeHtml(product.name)}</h1>
+                <p class="detail-brand">${escapeHtml(typeConfig.icon || '')} ${escapeHtml(typeConfig.name || product.type)} | ${escapeHtml(product.brand)}</p>
+                ${product.rating ? `<p class="detail-rating">⭐ ${escapeHtml(String(product.rating))}/5 (${escapeHtml(String(product.sales || 0))} 次租赁)</p>` : ''}
 
                 <div class="detail-price-box">
                     <div class="detail-price">
-                        ¥${product.price}<span> / 天</span>
+                        ¥${escapeHtml(String(product.price))}<span> / 天</span>
                     </div>
-                    <p style="color: var(--text-secondary); font-size: 0.9rem;">押金 ¥${product.deposit}（可退）</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">押金 ¥${escapeHtml(String(product.deposit))}（可退）</p>
                 </div>
 
                 ${recommendHtml}
@@ -382,27 +397,27 @@ const App = {
                     <div class="spec-grid">
                         <div class="spec-item">
                             <div class="spec-label">板长</div>
-                            <div class="spec-value">${product.length}</div>
+                            <div class="spec-value">${escapeHtml(String(product.length))}</div>
                         </div>
                         <div class="spec-item">
                             <div class="spec-label">板宽</div>
-                            <div class="spec-value">${product.width}</div>
+                            <div class="spec-value">${escapeHtml(String(product.width))}</div>
                         </div>
                         <div class="spec-item">
                             <div class="spec-label">硬度</div>
-                            <div class="spec-value">${product.flex}/10</div>
+                            <div class="spec-value">${escapeHtml(String(product.flex))}/10</div>
                         </div>
                         <div class="spec-item">
                             <div class="spec-label">板型</div>
-                            <div class="spec-value">${this._shapeName(product.shape)}</div>
+                            <div class="spec-value">${escapeHtml(this._shapeName(product.shape))}</div>
                         </div>
                         <div class="spec-item">
                             <div class="spec-label">板底</div>
-                            <div class="spec-value">${this._camberName(product.camber)}</div>
+                            <div class="spec-value">${escapeHtml(this._camberName(product.camber))}</div>
                         </div>
                         <div class="spec-item">
                             <div class="spec-label">库存</div>
-                            <div class="spec-value">${product.stock > 0 ? '✅ ' + product.stock + ' 件' : '❌ 缺货'}</div>
+                            <div class="spec-value">${product.stock > 0 ? '✅ ' + escapeHtml(String(product.stock)) + ' 件' : '❌ 缺货'}</div>
                         </div>
                         ${heightRangeHtml}
                     </div>
@@ -428,15 +443,15 @@ const App = {
 
                 <div class="detail-description">
                     <h3>📝 详细介绍</h3>
-                    <p>${product.description}</p>
-                    ${product.bestFor ? `<p class="best-for"><strong>💡 最佳场景：</strong>${product.bestFor}</p>` : ''}
+                    <p>${escapeHtml(product.description)}</p>
+                    ${product.bestFor ? `<p class="best-for"><strong>💡 最佳场景：</strong>${escapeHtml(product.bestFor)}</p>` : ''}
                 </div>
 
                 <div class="detail-actions">
-                    <button class="btn btn-primary" onclick="App.addToCart('${product.id}')">
+                    <button class="btn btn-primary" onclick="App.addToCart('${escapeHtml(product.id)}')">
                         🛒 加入购物车
                     </button>
-                    <button class="btn btn-outline" onclick="App.buyNow('${product.id}')">
+                    <button class="btn btn-outline" onclick="App.buyNow('${escapeHtml(product.id)}')">
                         立即租赁
                     </button>
                 </div>
@@ -774,7 +789,21 @@ const ProductFilter = {
                 products = products.filter(p =>
                     p.heightRange && p.height >= p.heightRange[0] && p.height <= p.heightRange[1]
                 );
+                if (products.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-recommendation">
+                            <div class="empty-icon">📏</div>
+                            <h3>没找到适配身高的板子</h3>
+                            <p>试试调整问卷中的身高数据，或浏览全部装备</p>
+                            <button class="btn btn-primary" onclick="RecommendationWizard.show()">重新测试</button>
+                        </div>
+                    `;
+                    if (countEl) countEl.textContent = '0';
+                    if (paginationEl) paginationEl.innerHTML = '';
+                    return;
+                }
             } else {
+                // 降级：没设身高时显示高评分产品，提示用户设身高可获得更精准推荐
                 products.sort((a, b) => b.rating - a.rating);
             }
         }
@@ -1007,3 +1036,8 @@ const Auth = {
         }
     }
 };
+
+// 暴露到全局，供 inline onclick 与非模块脚本调用
+window.App = App;
+window.ProductFilter = ProductFilter;
+window.Auth = Auth;

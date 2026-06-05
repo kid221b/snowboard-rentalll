@@ -828,3 +828,7 @@ const OrderHistory = {
         await this.render();
     }
 };
+
+// 暴露到全局
+window.OrderFlow = OrderFlow;
+window.OrderHistory = OrderHistory;

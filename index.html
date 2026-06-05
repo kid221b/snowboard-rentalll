@@ -221,7 +221,7 @@
                             <button class="tab-btn active" data-tab="all" onclick="ProductFilter.switchTab('all', this)">全部</button>
                             <button class="tab-btn" data-tab="recommended" onclick="ProductFilter.switchTab('recommended', this)">
                                 <span>✨</span> 为你推荐
-                                <span class="tab-hint" id="recommendedHint" style="display:none;">已登录</span>
+                                <span class="tab-hint" id="recommendedHint" style="display:none;">已设置偏好</span>
                             </button>
                             <button class="tab-btn" data-tab="hot" onclick="ProductFilter.switchTab('hot', this)">🔥 热门</button>
                             <button class="tab-btn" data-tab="suitable" onclick="ProductFilter.switchTab('suitable', this)">🎯 合适尺寸</button>
@@ -597,6 +597,6 @@
     <script type="module" src="js/cart.js?v=2"></script>
     <script type="module" src="js/order.js?v=2"></script>
     <script src="js/admin.js?v=2"></script>
-    <script src="js/recommendation.js?v=1"></script>
+    <script type="module" src="js/recommendation.js?v=1"></script>
 </body>
 </html>

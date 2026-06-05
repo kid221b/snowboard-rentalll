@@ -423,6 +423,10 @@ const SnowboardData = {
         USER_INFO: 'snowboard_user_info'
     },
 
+    // 当前数据 schema 版本（升级时 +1，用于触发数据迁移）
+    SCHEMA_VERSION: 2,
+    SCHEMA_VERSION_KEY: 'snowboard_data_version',
+
     /**
      * 初始化数据
      * 如果本地存储为空，则写入初始数据
@@ -450,11 +454,25 @@ const SnowboardData = {
     },
 
     /**
-     * 从本地存储读取产品数据
+     * 从本地存储读取产品数据（带 schema 迁移）
      */
     getProducts() {
         const data = localStorage.getItem(this.STORAGE_KEYS.PRODUCTS);
-        return data ? JSON.parse(this.decompress(data)) : this.PRODUCTS;
+        if (!data) return this.PRODUCTS;
+        try {
+            let stored = JSON.parse(data);
+            // schema 迁移：老数据没有 skillLevel/terrain/heightRange 等字段时，从内置 PRODUCTS 回填
+            stored = stored.map(p => {
+                if (p && p.skillLevel && p.terrain && p.heightRange && p.weightRange && p.bootSize) {
+                    return p;
+                }
+                const defaults = this.PRODUCTS.find(d => d.id === p.id);
+                return defaults ? { ...defaults, ...p } : p;
+            });
+            return stored;
+        } catch (e) {
+            return this.PRODUCTS;
+        }
     },
 
     /**
@@ -658,23 +676,18 @@ const SnowboardData = {
     },
 
     /**
-     * 数据压缩（简化版，实际可用LZ-string等库）
-     * 针对 localStorage 约5MB的限制做优化
+     * 数据压缩（保留方法签名以兼容旧代码，不再做有损的空格归一化）
      */
     compress(data) {
-        // 简单的字符串压缩：移除空格和换行
-        return data
-            .replace(/\s+/g, ' ')
-            .replace(/\s*([{}[])\s*/g, '$1')
-            .replace(/,\s*([}]])/g, '$1');
+        // 之前版本会移除多余空格，会损坏用户输入的多空格字符串。
+        // 现在改为恒等映射：localStorage 不需要为这点数据做压缩。
+        return data;
     },
 
     /**
-     * 数据解压
+     * 数据解压（保留方法签名，恒等映射）
      */
     decompress(data) {
-        // 在这里实现解压逻辑
-        // 目前压缩很轻量，解压直接返回原字符串
         return data;
     },
 
@@ -682,7 +695,7 @@ const SnowboardData = {
      * 生成唯一ID
      */
     generateId(prefix = '') {
-        return prefix + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
     }
 };
 
