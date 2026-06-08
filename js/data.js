@@ -411,6 +411,91 @@ const SnowboardData = {
     // 订单数据
     ORDERS: [],
 
+    // listings 缓存（由 listListings 异步填充）
+    LISTINGS_CACHE: [],
+    LISTINGS_CACHE_TIME: 0,
+    LISTINGS_CACHE_TTL: 60000,  // 1 分钟
+
+    /**
+     * 标准化 listing 格式（与 PRODUCTS 字段对齐）
+     * 便于统一渲染
+     */
+    normalizeListing(listing) {
+        if (!listing) return null;
+        return {
+            id: listing.id,
+            source: 'user',                          // 标记来源
+            name: listing.title,
+            brand: listing.brand,
+            model: listing.model,
+            year: listing.year,
+            type: listing.type,
+            length: listing.length,
+            width: listing.width,
+            flex: listing.flex,
+            shape: listing.shape,
+            camber: listing.camber,
+            price: listing.price_per_day,
+            deposit: listing.deposit,
+            stock: 1,
+            sales: listing.usage_count || 0,
+            featured: false,
+            images: listing.images || ['🏂'],
+            description: listing.description,
+            features: listing.features || [],
+            // 推荐元数据
+            skillLevel: listing.skill_level || [],
+            terrain: listing.terrain || [],
+            heightRange: listing.height_range,
+            weightRange: listing.weight_range,
+            bootSize: listing.boot_size,
+            condition: listing.condition,
+            ageYears: listing.age_years,
+            defects: listing.defects,
+            // 卖家信息
+            host: listing.host,
+            city: listing.city,
+            minDays: listing.min_days,
+            maxDays: listing.max_days,
+            shipping: listing.shipping,
+            selfPickup: listing.self_pickup,
+            // 评分
+            rating: listing.rating,
+            ratingCount: listing.rating_count,
+            // 元
+            viewCount: listing.view_count,
+            createdAt: listing.created_at
+        };
+    },
+
+    /**
+     * 获取 listings（带缓存，1 分钟 TTL）
+     * @returns {Promise<Array>} 标准化后的 listings
+     */
+    async getListings() {
+        const now = Date.now();
+        if (this.LISTINGS_CACHE.length > 0 && (now - this.LISTINGS_CACHE_TIME) < this.LISTINGS_CACHE_TTL) {
+            return this.LISTINGS_CACHE;
+        }
+        try {
+            const { listListings } = await import('./api.js');
+            const raw = await listListings({ limit: 100 });
+            this.LISTINGS_CACHE = (raw || []).map(l => this.normalizeListing(l));
+            this.LISTINGS_CACHE_TIME = now;
+            return this.LISTINGS_CACHE;
+        } catch (e) {
+            console.warn('getListings 失败:', e);
+            return this.LISTINGS_CACHE;  // 失败时返回旧缓存
+        }
+    },
+
+    /**
+     * 强制刷新 listings 缓存
+     */
+    invalidateListings() {
+        this.LISTINGS_CACHE_TIME = 0;
+    },
+
     /**
      * 数据存储键名
      */
