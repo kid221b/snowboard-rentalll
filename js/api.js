@@ -883,3 +883,336 @@ export async function getMyVerification() {
         return null;
     }
 }
+
+// ============================================
+//  Phase 3：社区（posts/comments/likes）
+// ============================================
+
+/**
+ * 列出 posts（feed）
+ * @param {object} options - { category, authorId, resortName, limit, offset, sortBy }
+ * @returns {Promise<Array>}
+ */
+export async function listPosts(options = {}) {
+    try {
+        let query = supabase
+            .from('posts')
+            .select(`
+                *,
+                author:profiles!posts_author_id_fkey (
+                    id, display_name, avatar_url, verified, rating, rating_count
+                )
+            `)
+            .eq('status', 'published');
+
+        if (options.category) query = query.eq('category', options.category);
+        if (options.authorId) query = query.eq('author_id', options.authorId);
+        if (options.resortName) query = query.eq('resort_name', options.resortName);
+
+        switch (options.sortBy) {
+            case 'hot':
+                query = query.order('like_count', { ascending: false });
+                break;
+            case 'comment':
+                query = query.order('comment_count', { ascending: false });
+                break;
+            case 'newest':
+            default:
+                query = query.order('is_pinned', { ascending: false })
+                    .order('created_at', { ascending: false });
+        }
+
+        if (options.limit) query = query.limit(options.limit);
+
+        const { data, error } = await query;
+        if (error) {
+            console.warn('listPosts error:', error);
+            return [];
+        }
+        return data || [];
+    } catch (err) {
+        console.error('listPosts 异常:', err);
+        return [];
+    }
+}
+
+/**
+ * 获取单个 post 详情
+ * @param {string} postId
+ * @returns {Promise<object|null>}
+ */
+export async function getPost(postId) {
+    try {
+        const { data, error } = await supabase
+            .from('posts')
+            .select(`
+                *,
+                author:profiles!posts_author_id_fkey (
+                    id, display_name, avatar_url, verified, rating, rating_count
+                )
+            `)
+            .eq('id', postId)
+            .single();
+
+        if (error) return null;
+
+        // 浏览 +1
+        try { await supabase.rpc('increment_post_view', { p_id: postId }); } catch (e) {}
+
+        return data;
+    } catch (err) {
+        return null;
+    }
+}
+
+/**
+ * 创建 post
+ * @param {object} postData
+ * @returns {Promise<{success: boolean, postId?: string, error?: string}>}
+ */
+export async function createPost(postData) {
+    try {
+        const user = await getCurrentUser();
+        if (!user) return { success: false, error: '请先登录' };
+
+        const allowed = [
+            'category', 'title', 'content', 'images', 'tags',
+            'resort_name', 'resort_location', 'skill_level', 'related_listing_id'
+        ];
+        const safe = sanitizeUpdates(postData, allowed);
+        safe.author_id = user.id;
+        safe.status = 'published';
+
+        if (!safe.title || !safe.content || !safe.category) {
+            return { success: false, error: '请填写标题、内容和分类' };
+        }
+
+        const { data, error } = await supabase
+            .from('posts')
+            .insert([safe])
+            .select()
+            .single();
+
+        if (error) return { success: false, error: '发布失败' };
+        return { success: true, postId: data.id };
+    } catch (err) {
+        return { success: false, error: '网络错误' };
+    }
+}
+
+/**
+ * 删除 post
+ */
+export async function deletePost(postId) {
+    try {
+        const user = await getCurrentUser();
+        if (!user) return { success: false, error: '请先登录' };
+        const { error } = await supabase
+            .from('posts')
+            .delete()
+            .eq('id', postId)
+            .eq('author_id', user.id);
+        if (error) return { success: false, error: '删除失败' };
+        return { success: true };
+    } catch (err) {
+        return { success: false, error: '网络错误' };
+    }
+}
+
+/**
+ * 获取 post 评论
+ */
+export async function getPostComments(postId) {
+    try {
+        const { data, error } = await supabase
+            .from('post_comments')
+            .select(`
+                *,
+                author:profiles!post_comments_author_id_fkey (id, display_name, avatar_url, verified)
+            `)
+            .eq('post_id', postId)
+            .eq('status', 'visible')
+            .order('created_at', { ascending: true });
+        if (error) return [];
+        return data || [];
+    } catch (err) {
+        return [];
+    }
+}
+
+/**
+ * 发表评论
+ */
+export async function createPostComment(postId, content, parentId = null) {
+    try {
+        const user = await getCurrentUser();
+        if (!user) return { success: false, error: '请先登录' };
+        if (!content || !content.trim()) return { success: false, error: '评论不能为空' };
+
+        const { data, error } = await supabase
+            .from('post_comments')
+            .insert([{
+                post_id: postId,
+                author_id: user.id,
+                content: content.trim(),
+                parent_id: parentId
+            }])
+            .select()
+            .single();
+        if (error) return { success: false, error: '评论失败' };
+        return { success: true, commentId: data.id };
+    } catch (err) {
+        return { success: false, error: '网络错误' };
+    }
+}
+
+/**
+ * 点赞/取消点赞
+ */
+export async function togglePostLike(postId) {
+    try {
+        const user = await getCurrentUser();
+        if (!user) return { success: false, error: '请先登录' };
+
+        const { data: existing } = await supabase
+            .from('post_likes')
+            .select('id')
+            .eq('post_id', postId)
+            .eq('user_id', user.id)
+            .single();
+
+        if (existing) {
+            await supabase.from('post_likes').delete().eq('id', existing.id);
+            return { success: true, liked: false };
+        } else {
+            await supabase.from('post_likes').insert([{ post_id: postId, user_id: user.id }]);
+            return { success: true, liked: true };
+        }
+    } catch (err) {
+        return { success: false, error: '操作失败' };
+    }
+}
+
+// ============================================
+//  Phase 3：Storage 图片上传
+// ============================================
+
+/**
+ * 上传图片到 Supabase Storage
+ * @param {File|Blob} file
+ * @param {string} folder - 目录前缀（e.g. 'listings/abc123'）
+ * @returns {Promise<{success: boolean, publicUrl?: string, path?: string, error?: string}>}
+ */
+export async function uploadImage(file, folder) {
+    try {
+        const user = await getCurrentUser();
+        if (!user) return { success: false, error: '请先登录' };
+
+        // 校验
+        if (!file || !file.type.startsWith('image/')) {
+            return { success: false, error: '请选择图片文件' };
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            return { success: false, error: '图片不能超过 10MB' };
+        }
+
+        // 路径：folder/userId-timestamp-random.ext
+        const ext = file.name ? file.name.split('.').pop() : 'jpg';
+        const timestamp = Date.now();
+        const random = Math.random().toString(36).slice(2, 8);
+        const path = `${folder}/${user.id}-${timestamp}-${random}.${ext}`;
+
+        const { error } = await supabase.storage
+            .from('listings')
+            .upload(path, file, {
+                cacheControl: '3600',
+                upsert: false
+            });
+
+        if (error) return { success: false, error: '上传失败：' + error.message };
+
+        const { data: { publicUrl } } = supabase.storage
+            .from('listings')
+            .getPublicUrl(path);
+
+        return { success: true, publicUrl, path };
+    } catch (err) {
+        return { success: false, error: '网络错误' };
+    }
+}
+
+/**
+ * 删除图片
+ */
+export async function deleteImage(path) {
+    try {
+        const { error } = await supabase.storage.from('listings').remove([path]);
+        return { success: !error };
+    } catch (err) {
+        return { success: false };
+    }
+}
+
+// ============================================
+//  Phase 3：Realtime 订阅
+// ============================================
+
+/**
+ * 订阅新消息
+ * @param {function} callback - (newMessage) => void
+ * @returns {function} unsubscribe
+ */
+export function subscribeToMessages(callback) {
+    const channel = supabase
+        .channel('messages-realtime')
+        .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages'
+        }, (payload) => {
+            callback(payload.new);
+        })
+        .subscribe();
+
+    return () => supabase.removeChannel(channel);
+}
+
+/**
+ * 订阅 post 评论
+ */
+export function subscribeToPostComments(postId, callback) {
+    const channel = supabase
+        .channel(`comments-${postId}`)
+        .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'post_comments',
+            filter: `post_id=eq.${postId}`
+        }, (payload) => {
+            callback(payload.new);
+        })
+        .subscribe();
+
+    return () => supabase.removeChannel(channel);
+}
+
+// ============================================
+//  Phase 3：个人资料
+// ============================================
+
+/**
+ * 获取用户 profile（含显示名/简介/评分等）
+ */
+export async function getProfile(userId) {
+    try {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .single();
+        if (error) return null;
+        return data;
+    } catch (e) {
+        return null;
+    }
+}

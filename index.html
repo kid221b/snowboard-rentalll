@@ -3,8 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>冰雪之巅 - 专业单板租赁平台</title>
+
+    <!-- SEO 基础 -->
+    <title>冰雪之巅 - 专业单板滑雪装备租赁平台 | 中阶/高阶雪友社区</title>
+    <meta name="description" content="冰雪之巅是面向中阶与高阶滑雪爱好者的单板装备双边租赁平台。个人和雪具店都可以发布雪具，按技能/地形/身材智能匹配，押金担保，信誉体系透明。">
+    <meta name="keywords" content="单板租赁,滑雪装备,雪具租赁,二手雪具,滑雪社区,单板滑雪,滑雪攻略,雪场">
+    <meta name="author" content="冰雪之巅 Snowboard Rental">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://kid221b.github.io/snowboard-rentalll/">
+
+    <!-- Open Graph / 微信分享 -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="冰雪之巅 - 单板滑雪装备租赁社区">
+    <meta property="og:description" content="专业单板租赁平台，中阶/高阶雪友社区。智能推荐 + 信誉体系 + 押金担保。">
+    <meta property="og:url" content="https://kid221b.github.io/snowboard-rentalll/">
+    <meta property="og:site_name" content="冰雪之巅">
+    <meta property="og:image" content="https://kid221b.github.io/snowboard-rentalll/icons/og-cover.png">
+    <meta property="og:locale" content="zh_CN">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="冰雪之巅 - 单板滑雪装备租赁">
+    <meta name="twitter:description" content="中阶/高阶雪友社区，专业智能推荐">
+
+    <!-- 移动端主题色 -->
+    <meta name="theme-color" content="#1e90ff">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%82%3C/text%3E%3C/svg%3E">
+
     <link rel="stylesheet" href="css/styles.css">
+
+    <!-- JSON-LD 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "冰雪之巅",
+        "alternateName": "Snowboard Rental",
+        "url": "https://kid221b.github.io/snowboard-rentalll/",
+        "description": "中阶与高阶滑雪爱好者的单板装备双边租赁平台",
+        "inLanguage": "zh-CN",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://kid221b.github.io/snowboard-rentalll/#products?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "冰雪之巅",
+        "url": "https://kid221b.github.io/snowboard-rentalll/",
+        "logo": "https://kid221b.github.io/snowboard-rentalll/icons/og-cover.png",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "400-888-6666",
+            "contactType": "customer service"
+        }
+    }
+    </script>
 </head>
 <body>
     <!-- 导航栏 -->
@@ -14,20 +74,25 @@
                 <span class="logo-icon">⛷️</span>
                 <span>冰雪之巅</span>
             </div>
-            <ul class="nav-menu">
-                <li><a href="#home" class="nav-link active" data-page="home">首页</a></li>
-                <li><a href="#products" class="nav-link" data-page="products">装备租赁</a></li>
-                <li><a href="#cart" class="nav-link" data-page="cart">购物车</a></li>
-                <li><a href="#orders" class="nav-link" data-page="orders">我的租赁</a></li>
-                <li><a href="#admin" class="nav-link" data-page="admin">管理面板</a></li>
-            </ul>
+        <ul class="nav-menu" id="primaryNav" role="menubar">
+            <li role="none"><a href="#home" class="nav-link active" data-page="home" role="menuitem">首页</a></li>
+            <li role="none"><a href="#products" class="nav-link" data-page="products" role="menuitem">装备租赁</a></li>
+            <li role="none"><a href="#" class="nav-link" onclick="CommunityUI.showFeed(); return false;" role="menuitem">雪友社区</a></li>
+            <li role="none"><a href="#cart" class="nav-link" data-page="cart" role="menuitem">购物车</a></li>
+            <li role="none"><a href="#orders" class="nav-link" data-page="orders" role="menuitem">我的租赁</a></li>
+            <li role="none"><a href="#admin" class="nav-link" data-page="admin" role="menuitem">管理面板</a></li>
+        </ul>
             <div class="nav-actions">
-                <button class="host-btn" onclick="HostUI.showOnboarding()">📦 发布雪具</button>
-                <button class="cart-btn" onclick="App.navigateTo('cart')">
-                    <span class="cart-icon">🛒</span>
-                    <span class="cart-count" id="cartCount">0</span>
+                <button class="host-btn" type="button" onclick="HostUI.showOnboarding()" aria-label="发布雪具">
+                    📦 发布雪具
                 </button>
-                <button class="mobile-menu-btn" onclick="App.toggleMobileMenu()">☰</button>
+                <button class="cart-btn" type="button" onclick="App.navigateTo('cart')" aria-label="购物车">
+                    <span class="cart-icon" aria-hidden="true">🛒</span>
+                    <span class="cart-count" id="cartCount" aria-live="polite">0</span>
+                </button>
+                <button class="mobile-menu-btn" type="button" onclick="App.toggleMobileMenu()" aria-label="打开菜单" aria-expanded="false" aria-controls="primaryNav">
+                    ☰
+                </button>
             </div>
         </div>
     </nav>
@@ -601,5 +666,7 @@
     <script src="js/recommendation.js?v=1"></script>
     <script type="module" src="js/host.js?v=1"></script>
     <script type="module" src="js/trust.js?v=1"></script>
+    <script type="module" src="js/community.js?v=1"></script>
+    <script type="module" src="js/profile.js?v=1"></script>
 </body>
 </html>
