@@ -647,3 +647,239 @@ export async function toggleFavorite(listingId) {
         return { success: false, error: '操作失败' };
     }
 }
+
+// ============================================
+//  Phase 2：评价 / 站内信 / 实名认证 API
+// ============================================
+
+/**
+ * 提交评价
+ * @param {object} reviewData
+ * @returns {Promise<{success: boolean, reviewId?: string, error?: string}>}
+ */
+export async function submitReview(reviewData) {
+    try {
+        const user = await getCurrentUser();
+        if (!user) return { success: false, error: '请先登录' };
+
+        const allowed = [
+            'listing_id', 'order_id', 'reviewee_id', 'rating', 'content', 'tags',
+            'is_anonymous', 'accuracy_rating', 'communication_rating', 'condition_rating'
+        ];
+        const safe = sanitizeUpdates(reviewData, allowed);
+        safe.reviewer_id = user.id;
+
+        // 子评分均值
+        const sub = [safe.accuracy_rating, safe.communication_rating, safe.condition_rating].filter(r => r);
+        if (sub.length > 0 && !safe.rating) {
+            safe.rating = Math.round(sub.reduce((a, b) => a + b, 0) / sub.length);
+        }
+
+        const { data, error } = await supabase
+            .from('reviews')
+            .insert([safe])
+            .select()
+            .single();
+
+        if (error) {
+            return { success: false, error: '评价失败，请稍后重试' };
+        }
+        return { success: true, reviewId: data.id };
+    } catch (err) {
+        return { success: false, error: '网络错误' };
+    }
+}
+
+/**
+ * 卖家回复评价
+ * @param {string} reviewId
+ * @param {string} reply
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+export async function replyReview(reviewId, reply) {
+    try {
+        const user = await getCurrentUser();
+        if (!user) return { success: false, error: '请先登录' };
+
+        const { error } = await supabase
+            .from('reviews')
+            .update({
+                host_reply: reply,
+                host_reply_at: new Date().toISOString()
+            })
+            .eq('id', reviewId)
+            .eq('reviewee_id', user.id);  // 只能回复自己的
+
+        if (error) return { success: false, error: '回复失败' };
+        return { success: true };
+    } catch (err) {
+        return { success: false, error: '网络错误' };
+    }
+}
+
+/**
+ * 获取 listing 的评价列表
+ * @param {string} listingId
+ * @returns {Promise<Array>}
+ */
+export async function getListingReviews(listingId) {
+    try {
+        const { data, error } = await supabase
+            .from('reviews')
+            .select(`
+                *,
+                reviewer:profiles!reviews_reviewer_id_fkey (
+                    id, display_name, avatar_url
+                )
+            `)
+            .eq('listing_id', listingId)
+            .eq('status', 'visible')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.warn('getListingReviews error:', error);
+            return [];
+        }
+        return data || [];
+    } catch (err) {
+        console.error('getListingReviews 异常:', err);
+        return [];
+    }
+}
+
+/**
+ * 发送站内信
+ * @param {string} receiverId
+ * @param {string} content
+ * @param {string} listingId
+ * @returns {Promise<{success: boolean, messageId?: string, error?: string}>}
+ */
+export async function sendMessage(receiverId, content, listingId = null) {
+    try {
+        const user = await getCurrentUser();
+        if (!user) return { success: false, error: '请先登录' };
+        if (!content || !content.trim()) return { success: false, error: '消息不能为空' };
+        if (user.id === receiverId) return { success: false, error: '不能给自己发消息' };
+
+        const { data, error } = await supabase
+            .from('messages')
+            .insert([{
+                sender_id: user.id,
+                receiver_id: receiverId,
+                content: content.trim(),
+                listing_id: listingId
+            }])
+            .select()
+            .single();
+
+        if (error) return { success: false, error: '发送失败' };
+        return { success: true, messageId: data.id };
+    } catch (err) {
+        return { success: false, error: '网络错误' };
+    }
+}
+
+/**
+ * 获取与某人的对话
+ * @param {string} otherUserId
+ * @returns {Promise<Array>}
+ */
+export async function getConversation(otherUserId) {
+    try {
+        const user = await getCurrentUser();
+        if (!user) return [];
+
+        const { data, error } = await supabase
+            .from('messages')
+            .select('*')
+            .or(`and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`)
+            .order('created_at', { ascending: true });
+
+        if (error) return [];
+        return data || [];
+    } catch (err) {
+        return [];
+    }
+}
+
+/**
+ * 标记消息为已读
+ * @param {string} otherUserId
+ */
+export async function markMessagesRead(otherUserId) {
+    try {
+        const user = await getCurrentUser();
+        if (!user) return;
+        await supabase
+            .from('messages')
+            .update({ read_at: new Date().toISOString() })
+            .eq('sender_id', otherUserId)
+            .eq('receiver_id', user.id)
+            .is('read_at', null);
+    } catch (e) {}
+}
+
+/**
+ * 获取未读消息数
+ */
+export async function getUnreadCount() {
+    try {
+        const user = await getCurrentUser();
+        if (!user) return 0;
+        const { count } = await supabase
+            .from('messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('receiver_id', user.id)
+            .is('read_at', null);
+        return count || 0;
+    } catch (e) {
+        return 0;
+    }
+}
+
+/**
+ * 提交实名/店铺认证
+ * @param {object} verificationData
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+export async function submitVerification(verificationData) {
+    try {
+        const user = await getCurrentUser();
+        if (!user) return { success: false, error: '请先登录' };
+
+        const allowed = ['type', 'real_name', 'id_number_hash', 'id_image_url', 'shop_name', 'shop_license_url'];
+        const safe = sanitizeUpdates(verificationData, allowed);
+        safe.user_id = user.id;
+        safe.status = 'pending';
+
+        const { error } = await supabase
+            .from('host_verifications')
+            .insert([safe]);
+
+        if (error) return { success: false, error: '提交失败' };
+        return { success: true };
+    } catch (err) {
+        return { success: false, error: '网络错误' };
+    }
+}
+
+/**
+ * 获取当前用户的认证状态
+ * @returns {Promise<object|null>}
+ */
+export async function getMyVerification() {
+    try {
+        const user = await getCurrentUser();
+        if (!user) return null;
+        const { data } = await supabase
+            .from('host_verifications')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('submitted_at', { ascending: false })
+            .limit(1)
+            .single();
+        return data;
+    } catch (e) {
+        return null;
+    }
+}

@@ -107,6 +107,7 @@ export async function logout() {
  */
 export async function getCurrentUser() {
     if (currentUser) {
+        window._currentUserId = currentUser.id;
         return currentUser;
     }
 
@@ -114,8 +115,10 @@ export async function getCurrentUser() {
         const { data } = await supabase.auth.getSession();
         if (data.session) {
             currentUser = data.session.user;
+            window._currentUserId = currentUser.id;
             return currentUser;
         }
+        window._currentUserId = null;
         return null;
     } catch (err) {
         return null;

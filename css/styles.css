@@ -174,6 +174,32 @@ ul {
     box-shadow: var(--shadow-md);
 }
 
+.msg-btn {
+    position: relative;
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px 6px;
+}
+
+.msg-badge {
+    position: absolute;
+    top: -2px;
+    right: -4px;
+    background: var(--accent-color);
+    color: white;
+    border-radius: 10px;
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    font-weight: 600;
+}
+
 .cart-btn {
     position: relative;
     padding: 8px;
@@ -2616,5 +2642,437 @@ ul {
     .form-row-4,
     .onboarding-type-options {
         grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* ===================================
+   Phase 2：评价 / 站内信 / 实名
+   =================================== */
+
+/* 星级评分输入 */
+.star-rating-input {
+    display: inline-flex;
+    gap: 4px;
+}
+
+.star-rating-input .star {
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.1s;
+    color: var(--text-light);
+}
+
+.star-rating-input .star:hover {
+    transform: scale(1.1);
+}
+
+.star-rating-input .star.active {
+    color: #fbbf24;
+}
+
+.star-rating-input.small .star {
+    font-size: 1.3rem;
+}
+
+.sub-rating-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sub-rating-label {
+    display: inline-block;
+    width: 80px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-right: 8px;
+}
+
+.review-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* 评价列表 */
+.reviews-section {
+    margin: 24px 0;
+    padding: 20px;
+    background: var(--bg-color);
+    border-radius: var(--radius-md);
+}
+
+.reviews-section h3 {
+    margin-bottom: 16px;
+}
+
+.rating-summary {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 16px;
+    background: var(--bg-white);
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+}
+
+.rating-big {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #fbbf24;
+}
+
+.rating-bars {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rating-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+}
+
+.rating-bar-label {
+    width: 30px;
+    color: var(--text-secondary);
+}
+
+.rating-bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.rating-bar-fill {
+    height: 100%;
+    background: #fbbf24;
+}
+
+.rating-bar-count {
+    width: 30px;
+    text-align: right;
+    color: var(--text-secondary);
+}
+
+.review-item {
+    background: var(--bg-white);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    margin-bottom: 8px;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.review-stars {
+    color: #fbbf24;
+    margin-left: 8px;
+}
+
+.review-date {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.review-tags-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.review-tag {
+    font-size: 0.75rem;
+    background: rgba(92, 184, 92, 0.1);
+    color: var(--success-color);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.review-content {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.host-reply {
+    background: var(--bg-color);
+    border-left: 3px solid var(--primary-color);
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-top: 8px;
+    font-size: 0.85rem;
+}
+
+.host-reply strong {
+    color: var(--primary-color);
+}
+
+/* 站内信 */
+.inbox {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.inbox-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.inbox-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.inbox-item:hover {
+    background: var(--bg-white);
+    transform: translateX(4px);
+}
+
+.inbox-avatar {
+    font-size: 2rem;
+    width: 40px;
+    text-align: center;
+}
+
+.inbox-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.inbox-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+}
+
+.inbox-time {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--text-light);
+}
+
+.inbox-preview {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.inbox-unread {
+    background: var(--accent-color);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.verified-badge {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.conversation {
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.conversation-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    background: var(--bg-color);
+    border-radius: var(--radius-md);
+    margin-bottom: 12px;
+    min-height: 300px;
+}
+
+.message-bubble {
+    max-width: 70%;
+    padding: 8px 12px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    display: inline-block;
+    clear: both;
+}
+
+.message-bubble.mine {
+    background: var(--primary-color);
+    color: white;
+    float: right;
+    border-bottom-right-radius: 4px;
+}
+
+.message-bubble.theirs {
+    background: var(--bg-white);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    float: left;
+    border-bottom-left-radius: 4px;
+}
+
+.message-time {
+    font-size: 0.7rem;
+    color: var(--text-light);
+    margin-top: 4px;
+    clear: both;
+    display: block;
+    text-align: center;
+}
+
+.conversation-input {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+.conversation-input textarea {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    resize: vertical;
+}
+
+/* 实名认证 */
+.verification-form {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.verification-status {
+    padding: 12px;
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.status-pending {
+    background: rgba(240, 173, 78, 0.1);
+    color: var(--warning-color);
+}
+
+.status-approved {
+    background: rgba(92, 184, 92, 0.1);
+    color: var(--success-color);
+}
+
+.status-rejected {
+    background: rgba(217, 83, 79, 0.1);
+    color: var(--danger-color);
+}
+
+/* ===================================
+   Phase 2：发布者信息卡（详情页）
+   =================================== */
+.host-info-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.host-card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-color);
+}
+
+.host-card-header h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.host-card-body {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    padding: 20px;
+    align-items: center;
+}
+
+.host-avatar {
+    font-size: 3.5rem;
+    width: 70px;
+    height: 70px;
+    background: var(--gradient-ice);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.host-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.host-name {
+    font-size: 1.1rem;
+}
+
+.host-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.host-bio {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.host-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 140px;
+}
+
+.unverified-badge {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    background: var(--bg-color);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+@media (max-width: 600px) {
+    .host-card-body {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    .host-avatar {
+        margin: 0 auto;
+    }
+    .host-stats {
+        justify-content: center;
     }
 }

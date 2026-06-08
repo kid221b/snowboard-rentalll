@@ -189,6 +189,28 @@ const RecommendationEngine = {
             reasons.push(`✓ 高分好评 ${product.rating}/5`);
         }
 
+        // 9. 信任加分（Phase 2：用户发布 listings）
+        if (product.host) {
+            const host = product.host;
+            if (host.verified) {
+                score += 8;
+                reasons.push('✓ 实名认证发布者');
+            }
+            if (host.rating && host.rating >= 4.5) {
+                score += 5;
+            }
+            if (host.completed_rentals >= 10) {
+                score += 3;
+                reasons.push(`✓ 资深发布者（${host.completed_rentals}+ 单成交）`);
+            }
+        }
+
+        // 10. 城市同城加分（如果用户填了身高，可推断城市）
+        if (profile.city && product.city && profile.city === product.city) {
+            score += 5;
+            reasons.push(`✓ 同城 ${escapeHtml(product.city)}`);
+        }
+
         return { score, reasons, matched };
     },
 

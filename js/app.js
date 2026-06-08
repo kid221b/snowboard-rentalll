@@ -79,16 +79,21 @@ const App = {
             // 显示用户菜单
             navActions.insertAdjacentHTML('beforeend', `
                 <div class="auth-buttons">
+                    <button class="msg-btn" onclick="TrustUI.showInbox()" title="消息">💬<span class="msg-badge" id="unreadBadge" style="display:none;">0</span></button>
                     <button class="user-menu-btn" onclick="App.toggleUserMenu()">
                         <span class="user-icon">👤</span>
                         <span class="user-name">${user.email?.split('@')[0] || '用户'}</span>
                     </button>
                     <div class="user-dropdown" id="userDropdown">
                         <button onclick="App.navigateTo('orders')">📋 我的订单</button>
+                        <button onclick="HostUI.showMyListings()">📦 我的发布</button>
+                        <button onclick="TrustUI.showVerificationForm()">🛡️ 实名认证</button>
                         <button onclick="Auth.logout(); App.closeUserMenu();">🚪 退出登录</button>
                     </div>
                 </div>
             `);
+            // 加载未读数
+            this.refreshUnreadCount();
         } else {
             // 显示登录按钮
             navActions.insertAdjacentHTML('beforeend', `
@@ -96,6 +101,20 @@ const App = {
                     <button class="login-btn" onclick="Auth.showModal()">登录</button>
                 </div>
             `);
+        }
+    },
+
+    async refreshUnreadCount() {
+        const { getUnreadCount } = await import('./api.js');
+        const count = await getUnreadCount();
+        const badge = document.getElementById('unreadBadge');
+        if (badge) {
+            if (count > 0) {
+                badge.textContent = count > 99 ? '99+' : count;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
         }
     },
 
@@ -306,8 +325,14 @@ const App = {
     /**
      * 显示产品详情
      */
-    showProductDetail(id) {
-        const product = SnowboardData.getProduct(id);
+    async showProductDetail(id) {
+        // 先尝试从 platform PRODUCTS 找
+        let product = SnowboardData.getProduct(id);
+        // 否则从 listings 找
+        if (!product) {
+            const listings = await SnowboardData.getListings();
+            product = listings.find(l => l.id === id);
+        }
         if (!product) {
             this.showToast('产品不存在', 'error');
             return;
@@ -458,6 +483,23 @@ const App = {
             </div>
         `;
 
+        // Phase 2：注入发布者信息卡 + 评价区块
+        if (product.source === 'user' && product.host) {
+            this._renderHostCard(product, container);
+        }
+
+        // 加载评价区块（仅 listings）
+        if (product.source === 'user') {
+            const reviewSection = document.createElement('div');
+            reviewSection.id = 'detailReviewsSection';
+            reviewSection.style.cssText = 'max-width: 800px; margin: 24px auto; padding: 0 16px;';
+            container.appendChild(reviewSection);
+            if (window.TrustUI) {
+                const html = await window.TrustUI.renderReviews(product.id, product.host?.id);
+                reviewSection.innerHTML = html;
+            }
+        }
+
         this.navigateTo('product-detail');
     },
 
@@ -472,6 +514,53 @@ const App = {
             'directional-twin': '准双向'
         };
         return map[shape] || '-';
+    },
+
+    /**
+     * 渲染发布者信息卡（详情页）
+     */
+    _renderHostCard(product, container) {
+        const host = product.host || {};
+        const hostName = escapeHtml(host.display_name || '发布者');
+        const avatar = escapeHtml(String(host.avatar_url || '👤'));
+        const city = escapeHtml(host.city || '未填');
+        const rating = (host.rating || 0).toFixed(1);
+        const verified = host.verified;
+        const listingCount = host.listing_count || 0;
+        const completedRentals = host.completed_rentals || 0;
+
+        const cardHtml = `
+            <div class="host-info-card" style="margin: 24px auto; max-width: 800px; padding: 0 16px;">
+                <div class="host-card-header">
+                    <h3>👤 发布者信息</h3>
+                </div>
+                <div class="host-card-body">
+                    <div class="host-avatar">${avatar}</div>
+                    <div class="host-meta">
+                        <div class="host-name-row">
+                            <strong class="host-name">${hostName}</strong>
+                            ${verified ? '<span class="verified-badge" title="已实名认证">✓ 已认证</span>' : '<span class="unverified-badge">未认证</span>'}
+                        </div>
+                        <div class="host-stats">
+                            <span>⭐ ${rating}/5 (${host.rating_count || 0})</span>
+                            <span>📦 在租 ${listingCount} 件</span>
+                            <span>✅ 已成交 ${completedRentals} 单</span>
+                            <span>📍 ${city}</span>
+                        </div>
+                        ${host.bio ? `<p class="host-bio">${escapeHtml(host.bio)}</p>` : ''}
+                    </div>
+                    <div class="host-actions">
+                        <button class="btn btn-primary btn-block" onclick="TrustUI.showMessageDialog('${escapeHtml(host.id)}', '${escapeHtml(product.id)}')">
+                            💬 联系发布者
+                        </button>
+                        <button class="btn btn-outline btn-block" onclick="App.toggleFavorite('${escapeHtml(product.id)}')">
+                            ⭐ 收藏
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', cardHtml);
     },
 
     /**
@@ -612,6 +701,13 @@ const App = {
     getUrlParam(param) {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(param);
+    },
+
+    /**
+     * 获取当前登录用户（暴露给 trust.js / host.js 用）
+     */
+    getCurrentUser() {
+        return getCurrentUser();
     }
 };
 
@@ -633,7 +729,7 @@ const ProductFilter = {
     /**
      * 初始化筛选器
      */
-    init() {
+    async init() {
         // 检查用户是否有推荐画像
         const profile = RecommendationState.load();
         if (profile) {
@@ -641,7 +737,7 @@ const ProductFilter = {
             if (hint) hint.style.display = 'inline';
         }
         this.renderFilters();
-        this.apply();
+        await this.apply();
     },
 
     /**
@@ -681,7 +777,7 @@ const ProductFilter = {
     /**
      * 应用筛选
      */
-    apply() {
+    async apply() {
         // 获取筛选值
         const typeCheckboxes = document.querySelectorAll('input[name="type"]:checked');
         const brandCheckboxes = document.querySelectorAll('input[name="brand"]:checked');
@@ -710,7 +806,7 @@ const ProductFilter = {
         this.currentPage = 1;
 
         // 渲染结果
-        this.render();
+        await this.render();
     },
 
     /**
@@ -742,17 +838,20 @@ const ProductFilter = {
     },
 
     /**
-     * 渲染产品列表
+     * 渲染产品列表（合并平台产品 + 用户 listings）
      */
-    render() {
+    async render() {
         const container = document.getElementById('productList');
         const countEl = document.getElementById('productCount');
         const paginationEl = document.getElementById('pagination');
 
         if (!container) return;
 
-        // 获取产品
-        let products = SnowboardData.getProducts();
+        // 合并数据源
+        const platformProducts = SnowboardData.getProducts()
+            .map(p => ({ ...p, source: 'platform' }));  // 标记平台产品
+        const userListings = await SnowboardData.getListings();
+        let products = [...platformProducts, ...userListings];
 
         // Tab 排序
         if (this.activeTab === 'recommended') {
