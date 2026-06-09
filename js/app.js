@@ -310,7 +310,7 @@ const App = {
         return `
             <div class="product-card" onclick="App.showProductDetail('${escapeHtml(product.id)}')">
                 <div class="product-image">
-                    ${escapeHtml(String(product.images?.[0] || '🏂'))}
+                    ${BoardRenderer.render(product, { width: 280, height: 160 })}
                     ${product.featured ? '<span class="product-badge">热门</span>' : ''}
                 </div>
                 <div class="product-info">
@@ -343,6 +343,9 @@ const App = {
             this.showToast('产品不存在', 'error');
             return;
         }
+
+        // 缓存当前产品供 switchBoardView 使用
+        App._currentDetailProduct = product;
 
         const typeConfig = SnowboardData.TYPE_CONFIG[product.type] || {};
         const container = document.getElementById('productDetail');
@@ -402,11 +405,14 @@ const App = {
 
         container.innerHTML = `
             <div class="detail-images">
-                <div class="main-image" role="img" aria-label="${escapeHtml(product.name)} 配图">${escapeHtml(String(product.images?.[0] || '🏂'))}</div>
+                <div class="main-image" role="img" aria-label="${escapeHtml(product.name)} 配图">${BoardRenderer.render(product, { width: 420, height: 240 })}</div>
                 <div class="thumbnails" role="tablist" aria-label="产品图片">
-                    ${(product.images || []).map((img, idx) => `
-                        <div class="thumbnail ${idx === 0 ? 'active' : ''}" role="tab" tabindex="0" aria-selected="${idx === 0}" aria-label="${escapeHtml(product.name)} 图片 ${idx + 1}" onclick="App.switchImage(this, '${escapeHtml(String(img))}')" onkeypress="if(event.key==='Enter'){App.switchImage(this, '${escapeHtml(String(img))}')}">${escapeHtml(String(img))}</div>
-                    `).join('')}
+                    ${[0, 1, 2].map((idx) => {
+                        const variants = [{}, { shape: 'twin' }, { camber: 'camber' }];
+                        return `
+                            <div class="thumbnail ${idx === 0 ? 'active' : ''}" role="tab" tabindex="0" aria-selected="${idx === 0}" aria-label="${escapeHtml(product.name)} 视角 ${idx + 1}" onclick="App.switchBoardView(this, ${idx})" onkeypress="if(event.key==='Enter'){App.switchBoardView(this, ${idx})}">${BoardRenderer.render({ ...product, ...variants[idx] }, { width: 80, height: 50, showBrand: false })}</div>
+                        `;
+                    }).join('')}
                 </div>
             </div>
             <div class="detail-info">
@@ -583,15 +589,27 @@ const App = {
     },
 
     /**
-     * 切换产品图片
+     * 切换产品主图视角（SVG 雪板 3 个变体）
+     */
+    switchBoardView(thumbnail, viewIndex) {
+        const mainImage = document.querySelector('.main-image');
+        const product = App._currentDetailProduct;
+        if (!mainImage || !product) return;
+        const variants = [
+            {},  // 默认
+            { shape: product.shape === 'twin' ? 'directional' : 'twin' },  // 切换板型
+            { camber: product.camber === 'camber' ? 'rocker' : 'camber' }   // 切换拱度
+        ];
+        mainImage.innerHTML = BoardRenderer.render({ ...product, ...variants[viewIndex] }, { width: 420, height: 240 });
+        document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+        if (thumbnail) thumbnail.classList.add('active');
+    },
+
+    /**
+     * 兼容旧 API：切换 emoji 图片（已废弃）
      */
     switchImage(thumbnail, image) {
-        const mainImage = document.querySelector('.main-image');
-        if (mainImage && thumbnail) {
-            mainImage.textContent = image;
-            document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
-            thumbnail.classList.add('active');
-        }
+        this.switchBoardView(thumbnail, 0);
     },
 
     /**

@@ -24,9 +24,15 @@ const OrderFlow = {
         phone: '',
         idCard: '',
         pickupType: 'store',
-        deliveryAddress: '',
+        deliveryResort: '',     // 雪场 ID（resort 方式时）
+        deliveryAddress: '',     // 快递地址（express 方式时）
+        expressRegion: 'normal', // 普通/偏远（express 时）
         remarks: ''
     },
+
+    // 当前选中的交付方式
+    currentDeliveryMethod: 'store',
+    currentDeliveryFee: 0,
 
     /**
      * 初始化订单流程
@@ -213,28 +219,114 @@ const OrderFlow = {
      * 初始化步骤3
      */
     initStep3() {
-        const pickupType = document.getElementById('pickupType');
-        const deliveryAddressGroup = document.getElementById('deliveryAddressGroup');
-
-        if (pickupType && deliveryAddressGroup) {
-            pickupType.addEventListener('change', () => {
-                if (pickupType.value === 'delivery') {
-                    deliveryAddressGroup.style.display = 'flex';
-                } else {
-                    deliveryAddressGroup.style.display = 'none';
-                }
-            });
+        // 渲染交付方式选择
+        const methodContainer = document.getElementById('deliveryMethodContainer');
+        if (methodContainer) {
+            methodContainer.innerHTML = DeliveryConfig.renderMethodSelector(this.currentDeliveryMethod);
+            this.bindDeliveryMethodEvents();
         }
 
         // 加载保存的个人信息
         const savedInfo = SnowboardData.getUserInfo();
         if (savedInfo) {
             this.personalInfo = savedInfo;
-            document.getElementById('userName').value = savedInfo.name || '';
-            document.getElementById('userPhone').value = savedInfo.phone || '';
-            document.getElementById('userIdCard').value = savedInfo.idCard || '';
-            document.getElementById('userRemarks').value = savedInfo.remarks || '';
+            this.currentDeliveryMethod = savedInfo.pickupType || 'store';
         }
+
+        this.renderDeliveryDetail();
+    },
+
+    /**
+     * 绑定交付方式切换事件
+     */
+    bindDeliveryMethodEvents() {
+        const radios = document.querySelectorAll('input[name="pickupType"]');
+        radios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                this.currentDeliveryMethod = e.target.value;
+                document.querySelectorAll('.delivery-method').forEach(el => {
+                    el.classList.toggle('selected', el.dataset.method === this.currentDeliveryMethod);
+                });
+                this.renderDeliveryDetail();
+            });
+        });
+    },
+
+    /**
+     * 渲染动态详情（雪场选择 / 快递地址）
+     */
+    renderDeliveryDetail() {
+        const detailContainer = document.getElementById('deliveryDetailContainer');
+        if (!detailContainer) return;
+
+        if (this.currentDeliveryMethod === 'store') {
+            detailContainer.innerHTML = `
+                <div class="form-group" style="background: var(--bg-soft); padding: 12px; border-radius: 8px;">
+                    <div style="display: flex; gap: 8px; align-items: start;">
+                        <span style="font-size: 1.4rem;">🏬</span>
+                        <div>
+                            <strong>门店自取</strong><br>
+                            <small style="color: var(--text-secondary);">地址：北京市朝阳区国家游泳中心南侧（地铁奥林匹克公园站 B 出口步行 800m）</small><br>
+                            <small style="color: var(--text-secondary);">营业时间：09:00 - 21:00（雪季 7×24）</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (this.currentDeliveryMethod === 'resort') {
+            detailContainer.innerHTML = DeliveryConfig.renderResortSelector(this.personalInfo.deliveryResort);
+            const select = document.getElementById('deliveryResort');
+            if (select) {
+                select.addEventListener('change', (e) => {
+                    this.personalInfo.deliveryResort = e.target.value;
+                    this.updateResortInfo(e.target.value);
+                    this.updateDeliveryFee();
+                });
+                this.updateResortInfo(select.value);
+            }
+        } else if (this.currentDeliveryMethod === 'express') {
+            detailContainer.innerHTML = DeliveryConfig.renderResortSelector();
+            // 隐藏 resort 组，显示 express 组
+            const resortGroup = document.getElementById('resortSelectGroup');
+            const expressGroup = document.getElementById('expressAddressGroup');
+            if (resortGroup) resortGroup.style.display = 'none';
+            if (expressGroup) {
+                expressGroup.style.display = 'flex';
+                const regionSelect = document.getElementById('expressRegion');
+                if (regionSelect) {
+                    regionSelect.addEventListener('change', () => this.updateDeliveryFee());
+                }
+            }
+        }
+        this.updateDeliveryFee();
+    },
+
+    /**
+     * 更新雪场信息
+     */
+    updateResortInfo(resortId) {
+        const infoEl = document.getElementById('resortInfo');
+        if (!infoEl) return;
+        const resort = DeliveryConfig.RESORTS.find(r => r.id === resortId);
+        if (!resort) {
+            infoEl.innerHTML = '';
+            return;
+        }
+        infoEl.innerHTML = `
+            <div class="resort-card">
+                <div class="resort-detail"><strong>海拔：</strong>${this.escapeHtml(resort.altitude)}</div>
+                <div class="resort-detail"><strong>雪道：</strong>${this.escapeHtml(resort.runs)}</div>
+            </div>
+        `;
+    },
+
+    /**
+     * 更新交付费用
+     */
+    updateDeliveryFee() {
+        const region = document.getElementById('expressRegion')?.value || 'normal';
+        this.currentDeliveryFee = DeliveryConfig.calculateFee(this.currentDeliveryMethod, { region });
+        // 触发 step4 重新渲染（如果有）
+        if (this.currentStep === 4) this.initStep4();
     },
 
     /**
@@ -245,10 +337,17 @@ const OrderFlow = {
             name: document.getElementById('userName')?.value || '',
             phone: document.getElementById('userPhone')?.value || '',
             idCard: document.getElementById('userIdCard')?.value || '',
-            pickupType: document.getElementById('pickupType')?.value || 'store',
+            pickupType: this.currentDeliveryMethod,
+            deliveryResort: document.getElementById('deliveryResort')?.value || '',
             deliveryAddress: document.getElementById('deliveryAddress')?.value || '',
+            expressRegion: document.getElementById('expressRegion')?.value || 'normal',
             remarks: document.getElementById('userRemarks')?.value || ''
         };
+
+        // 计算最终费用
+        this.currentDeliveryFee = DeliveryConfig.calculateFee(this.currentDeliveryMethod, {
+            region: this.personalInfo.expressRegion
+        });
 
         // 保存个人信息
         SnowboardData.saveUserInfo(this.personalInfo);
@@ -271,11 +370,27 @@ const OrderFlow = {
             errors.push('请输入正确的手机号');
         }
 
-        if (info.pickupType === 'delivery' && (!info.deliveryAddress || info.deliveryAddress.trim() === '')) {
-            errors.push('请输入配送地址');
+        if (info.pickupType === 'resort' && !info.deliveryResort) {
+            errors.push('请选择雪场');
+        }
+
+        if (info.pickupType === 'express' && (!info.deliveryAddress || info.deliveryAddress.trim() === '')) {
+            errors.push('请输入快递地址');
         }
 
         return errors;
+    },
+
+    /**
+     * 转义（独立工具避免依赖）
+     */
+    escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#x27;');
     },
 
     /**
@@ -321,6 +436,16 @@ const OrderFlow = {
         const discount = Cart.getPackageDiscount();
         const total = Math.round((subtotal + accessoryTotal) * this.rentDays * discount);
         const savings = Math.round((subtotal + accessoryTotal) * this.rentDays * (1 - discount));
+        const deliveryFee = this.currentDeliveryFee || DeliveryConfig.calculateFee(this.currentDeliveryMethod, {
+            region: this.personalInfo.expressRegion
+        });
+
+        // 交付方式描述
+        const deliveryDesc = DeliveryConfig.describe(this.currentDeliveryMethod, {
+            resortId: this.personalInfo.deliveryResort,
+            region: this.personalInfo.expressRegion,
+            address: this.personalInfo.deliveryAddress
+        });
 
         container.innerHTML = `
             <div class="order-confirm-section">
@@ -344,20 +469,32 @@ const OrderFlow = {
                 <h4>📋 个人信息</h4>
                 <div class="item-row">
                     <span>姓名</span>
-                    <span>${escapeHtml(this.personalInfo.name)}</span>
+                    <span>${this.escapeHtml(this.personalInfo.name)}</span>
                 </div>
                 <div class="item-row">
                     <span>手机号</span>
-                    <span>${escapeHtml(this.personalInfo.phone)}</span>
+                    <span>${this.escapeHtml(this.personalInfo.phone)}</span>
                 </div>
                 <div class="item-row">
-                    <span>取板方式</span>
-                    <span>${this.personalInfo.pickupType === 'delivery' ? '雪场直送' : '门店自取'}</span>
+                    <span>交付方式</span>
+                    <span>${deliveryDesc}</span>
                 </div>
-                ${this.personalInfo.pickupType === 'delivery' ? `
+                ${this.currentDeliveryMethod === 'resort' && this.personalInfo.deliveryResort ? `
                     <div class="item-row">
-                        <span>配送地址</span>
-                        <span>${escapeHtml(this.personalInfo.deliveryAddress)}</span>
+                        <span>配送雪场</span>
+                        <span>${this.escapeHtml((DeliveryConfig.RESORTS.find(r => r.id === this.personalInfo.deliveryResort) || {}).name || '')}</span>
+                    </div>
+                ` : ''}
+                ${this.currentDeliveryMethod === 'express' && this.personalInfo.deliveryAddress ? `
+                    <div class="item-row">
+                        <span>快递地址</span>
+                        <span>${this.escapeHtml(this.personalInfo.deliveryAddress)}</span>
+                    </div>
+                ` : ''}
+                ${this.personalInfo.remarks ? `
+                    <div class="item-row">
+                        <span>备注</span>
+                        <span>${this.escapeHtml(this.personalInfo.remarks)}</span>
                     </div>
                 ` : ''}
             </div>
@@ -374,13 +511,19 @@ const OrderFlow = {
                         <span>-¥${savings}</span>
                     </div>
                 ` : ''}
+                ${deliveryFee > 0 ? `
+                    <div class="item-row">
+                        <span>${this.currentDeliveryMethod === 'express' ? '快递费' : '雪场直送费'}</span>
+                        <span>¥${deliveryFee}</span>
+                    </div>
+                ` : ''}
                 <div class="item-row">
                     <span>押金（可退）</span>
                     <span>¥${deposit}</span>
                 </div>
                 <div class="item-row total">
                     <span>应付总额</span>
-                    <span>¥${total + deposit}</span>
+                    <span>¥${total + deliveryFee + deposit}</span>
                 </div>
             </div>
         `;
