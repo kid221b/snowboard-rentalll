@@ -5,9 +5,9 @@
 import {
     getProfile,
     updateMyProfile,
-    getMyListings,
-    getCurrentUser
+    getMyListings
 } from './api.js';
+import { getCurrentUser } from './auth.js';
 
 function escapeHtml(str) {
     if (str == null) return '';

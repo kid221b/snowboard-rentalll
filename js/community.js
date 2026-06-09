@@ -13,9 +13,9 @@ import {
     togglePostLike,
     getProfile,
     subscribeToPostComments,
-    uploadImage,
-    getCurrentUser
+    uploadImage
 } from './api.js';
+import { getCurrentUser } from './auth.js';
 
 function escapeHtml(str) {
     if (str == null) return '';

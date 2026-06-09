@@ -79,16 +79,17 @@ const App = {
             // 显示用户菜单
             navActions.insertAdjacentHTML('beforeend', `
                 <div class="auth-buttons">
-                    <button class="msg-btn" onclick="TrustUI.showInbox()" title="消息">💬<span class="msg-badge" id="unreadBadge" style="display:none;">0</span></button>
-                    <button class="user-menu-btn" onclick="App.toggleUserMenu()">
-                        <span class="user-icon">👤</span>
-                        <span class="user-name">${user.email?.split('@')[0] || '用户'}</span>
+                    <button class="msg-btn" onclick="TrustUI.showInbox()" aria-label="消息中心" title="消息">💬<span class="msg-badge" id="unreadBadge" style="display:none;">0</span></button>
+                    <button class="user-menu-btn" onclick="App.toggleUserMenu()" aria-haspopup="menu" aria-expanded="false">
+                        <span class="user-icon" aria-hidden="true">👤</span>
+                        <span class="user-name">${escapeHtml(user.email?.split('@')[0] || '用户')}</span>
                     </button>
-                    <div class="user-dropdown" id="userDropdown">
-                        <button onclick="App.navigateTo('orders')">📋 我的订单</button>
-                        <button onclick="HostUI.showMyListings()">📦 我的发布</button>
-                        <button onclick="TrustUI.showVerificationForm()">🛡️ 实名认证</button>
-                        <button onclick="Auth.logout(); App.closeUserMenu();">🚪 退出登录</button>
+                    <div class="user-dropdown" id="userDropdown" role="menu">
+                        <button onclick="App.navigateTo('orders')" role="menuitem">📋 我的订单</button>
+                        <button onclick="HostUI.showMyListings()" role="menuitem">📦 我的发布</button>
+                        <button onclick="ProfileUI.showEditForm()" role="menuitem">✏️ 编辑资料</button>
+                        <button onclick="TrustUI.showVerificationForm()" role="menuitem">🛡️ 实名认证</button>
+                        <button onclick="Auth.logout(); App.closeUserMenu();" role="menuitem">🚪 退出登录</button>
                     </div>
                 </div>
             `);
@@ -163,7 +164,12 @@ const App = {
      */
     toggleMobileMenu() {
         const menu = document.querySelector('.nav-menu');
-        menu.classList.toggle('show');
+        const btn = document.querySelector('.mobile-menu-btn');
+        const isOpen = menu.classList.toggle('show');
+        if (btn) {
+            btn.setAttribute('aria-expanded', String(isOpen));
+            btn.setAttribute('aria-label', isOpen ? '关闭菜单' : '打开菜单');
+        }
     },
 
     /**
@@ -396,10 +402,10 @@ const App = {
 
         container.innerHTML = `
             <div class="detail-images">
-                <div class="main-image">${escapeHtml(String(product.images?.[0] || '🏂'))}</div>
-                <div class="thumbnails">
+                <div class="main-image" role="img" aria-label="${escapeHtml(product.name)} 配图">${escapeHtml(String(product.images?.[0] || '🏂'))}</div>
+                <div class="thumbnails" role="tablist" aria-label="产品图片">
                     ${(product.images || []).map((img, idx) => `
-                        <div class="thumbnail ${idx === 0 ? 'active' : ''}" onclick="App.switchImage(this, '${escapeHtml(String(img))}')">${escapeHtml(String(img))}</div>
+                        <div class="thumbnail ${idx === 0 ? 'active' : ''}" role="tab" tabindex="0" aria-selected="${idx === 0}" aria-label="${escapeHtml(product.name)} 图片 ${idx + 1}" onclick="App.switchImage(this, '${escapeHtml(String(img))}')" onkeypress="if(event.key==='Enter'){App.switchImage(this, '${escapeHtml(String(img))}')}">${escapeHtml(String(img))}</div>
                     `).join('')}
                 </div>
             </div>

@@ -32,6 +32,10 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%82%3C/text%3E%3C/svg%3E">
 
+    <!-- DNS 预解析 / 预连接 -->
+    <link rel="preconnect" href="https://tcfauscqmfaimucuxrlm.supabase.co" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
     <link rel="stylesheet" href="css/styles.css">
 
     <!-- JSON-LD 结构化数据 -->
@@ -67,8 +71,10 @@
     </script>
 </head>
 <body>
+    <!-- A11y: 跳过导航直达主内容 -->
+    <a href="#app" class="skip-link">跳到主要内容</a>
     <!-- 导航栏 -->
-    <nav class="navbar">
+    <nav class="navbar" aria-label="主导航">
         <div class="container nav-container">
             <div class="logo">
                 <span class="logo-icon">⛷️</span>
@@ -98,7 +104,7 @@
     </nav>
 
     <!-- 页面容器 -->
-    <main id="app">
+    <main id="app" tabindex="-1">
         <!-- 首页 -->
         <section id="page-home" class="page active">
             <!-- 促销横幅 -->

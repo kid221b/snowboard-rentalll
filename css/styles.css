@@ -8,13 +8,13 @@
     --primary-dark: #0066cc;
     --primary-light: #87ceeb;
     --secondary-color: #5bc0de;
-    --accent-color: #ff6b6b;
-    --success-color: #5cb85c;
-    --warning-color: #f0ad4e;
-    --danger-color: #d9534f;
-    --text-primary: #333;
-    --text-secondary: #666;
-    --text-light: #999;
+    --accent-color: #d63031;
+    --success-color: #3d8b3d;
+    --warning-color: #c47e15;
+    --danger-color: #b52a2a;
+    --text-primary: #1a1a1a;
+    --text-secondary: #4a4a4a;
+    --text-light: #6b6b6b;
     --bg-color: #f5f8fa;
     --bg-white: #fff;
     --bg-dark: #1a2a3a;
@@ -67,6 +67,24 @@ a {
     outline: 3px solid var(--primary-color);
     outline-offset: 2px;
     border-radius: 2px;
+}
+
+/* A11y: skip link */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 8px;
+    background: var(--primary-color);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    z-index: 10000;
+    text-decoration: none;
+    font-weight: 600;
+    transition: top 0.2s;
+}
+.skip-link:focus {
+    top: 8px;
 }
 
 button:focus-visible,
@@ -3099,7 +3117,7 @@ ul {
     }
 }
 /* ===================================
-   Phase 3£ºÉçÇø
+   Phase 3ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
    =================================== */
 .community-feed, .post-detail, .post-form, .profile-page, .profile-edit {
     max-height: 70vh;
@@ -3368,7 +3386,7 @@ ul {
 }
 
 /* ===================================
-   Phase 3£º¸öÈË×ÊÁÏ
+   Phase 3ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
    =================================== */
 .profile-page, .profile-edit {
     padding: 0 4px;

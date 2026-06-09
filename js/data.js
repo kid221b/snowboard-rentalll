@@ -416,6 +416,11 @@ const SnowboardData = {
     LISTINGS_CACHE_TIME: 0,
     LISTINGS_CACHE_TTL: 60000,  // 1 分钟
 
+    // 平台产品内存缓存（避免重复 JSON.parse）
+    _productsCache: null,
+    _productsCacheTime: 0,
+    _productsCacheTTL: 60000,
+
     /**
      * 标准化 listing 格式（与 PRODUCTS 字段对齐）
      * 便于统一渲染
@@ -539,11 +544,19 @@ const SnowboardData = {
     },
 
     /**
-     * 从本地存储读取产品数据（带 schema 迁移）
+     * 从本地存储读取产品数据（带 schema 迁移 + 内存缓存）
      */
     getProducts() {
+        const now = Date.now();
+        if (this._productsCache && (now - this._productsCacheTime) < this._productsCacheTTL) {
+            return this._productsCache;
+        }
         const data = localStorage.getItem(this.STORAGE_KEYS.PRODUCTS);
-        if (!data) return this.PRODUCTS;
+        if (!data) {
+            this._productsCache = this.PRODUCTS;
+            this._productsCacheTime = now;
+            return this.PRODUCTS;
+        }
         try {
             let stored = JSON.parse(data);
             // schema 迁移：老数据没有 skillLevel/terrain/heightRange 等字段时，从内置 PRODUCTS 回填
@@ -554,10 +567,19 @@ const SnowboardData = {
                 const defaults = this.PRODUCTS.find(d => d.id === p.id);
                 return defaults ? { ...defaults, ...p } : p;
             });
+            this._productsCache = stored;
+            this._productsCacheTime = now;
             return stored;
         } catch (e) {
             return this.PRODUCTS;
         }
+    },
+
+    /**
+     * 强制刷新产品缓存（admin 改完调用）
+     */
+    invalidateProducts() {
+        this._productsCacheTime = 0;
     },
 
     /**
@@ -568,6 +590,7 @@ const SnowboardData = {
             this.STORAGE_KEYS.PRODUCTS,
             this.compress(JSON.stringify(products))
         );
+        this.invalidateProducts();  // 失效缓存
     },
 
     /**
