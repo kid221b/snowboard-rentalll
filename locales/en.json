@@ -1,0 +1,440 @@
+{
+  "meta": {
+    "lang": "en",
+    "name": "English"
+  },
+  "common": {
+    "appName": "Snowboard Rental",
+    "appFullName": "Snowboard Rental - Professional Gear Marketplace",
+    "tagline": "Pro Gear · Smart Match · Trusted Rental",
+    "loading": "Loading...",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "prev": "Previous",
+    "close": "Close",
+    "viewMore": "View More",
+    "viewAll": "View All",
+    "search": "Search",
+    "more": "More",
+    "less": "Less",
+    "free": "Free",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Rentals",
+    "community": "Community",
+    "cart": "Cart",
+    "orders": "My Rentals",
+    "admin": "Admin",
+    "publish": "List Gear",
+    "login": "Log In",
+    "register": "Sign Up",
+    "logout": "Log Out",
+    "messages": "Messages"
+  },
+  "home": {
+    "hero": {
+      "title": "🏂 Snowboard Rental, Effortless",
+      "subtitle": "C2C + B2C marketplace for intermediate to advanced riders",
+      "desc": "Smart matching · Verified hosts · Resort delivery",
+      "ctaRent": "Rent Now",
+      "ctaRecommend": "Get Smart Match"
+    },
+    "packages": {
+      "title": "Flexible Packages",
+      "weekend": {
+        "name": "Weekend Sprint",
+        "days": "2 days",
+        "desc": "Quick getaway"
+      },
+      "short": {
+        "name": "Short Trip",
+        "days": "3 days",
+        "desc": "Long weekend escape"
+      },
+      "long": {
+        "name": "Deep Dive",
+        "days": "5 days",
+        "desc": "Best window to level up"
+      },
+      "vacation": {
+        "name": "Full Vacation",
+        "days": "7 days",
+        "desc": "A full week on the mountain"
+      }
+    },
+    "features": {
+      "title": "Why Choose Us",
+      "quality": {
+        "title": "Pro Quality",
+        "desc": "All gear professionally maintained"
+      },
+      "delivery": {
+        "title": "Easy Delivery",
+        "desc": "Pickup, resort drop-off, or shipping"
+      },
+      "price": {
+        "title": "Fair Pricing",
+        "desc": "Package discounts, refundable deposit, no hidden fees"
+      },
+      "safety": {
+        "title": "Safe & Trusted",
+        "desc": "ID verification + reputation system, full transparency"
+      }
+    },
+    "hot": "Popular Boards",
+    "hotDesc": "Rider favorites"
+  },
+  "products": {
+    "title": "Rentals",
+    "tabs": {
+      "all": "All",
+      "recommend": "For You",
+      "hot": "Popular",
+      "suitable": "Right Size"
+    },
+    "filter": {
+      "type": "Type",
+      "price": "Price",
+      "brand": "Brand",
+      "reset": "Reset"
+    },
+    "sort": {
+      "label": "Sort",
+      "default": "Default",
+      "priceAsc": "Price: Low to High",
+      "priceDesc": "Price: High to Low",
+      "sales": "Best Selling",
+      "rating": "Top Rated"
+    },
+    "card": {
+      "stock": "In stock ({count})",
+      "outOfStock": "Out of stock",
+      "hot": "Popular",
+      "perDay": "/day"
+    },
+    "detail": {
+      "specs": "Specifications",
+      "features": "Features",
+      "skills": "Skill Levels",
+      "terrain": "Terrain",
+      "description": "Description",
+      "recommendFor": "Best For",
+      "addToCart": "Add to Cart",
+      "rentNow": "Rent Now",
+      "deposit": "Deposit",
+      "stock": "Stock",
+      "views": "Views",
+      "hostInfo": "Host Info",
+      "noHost": "Platform owned",
+      "backToList": "Back to list"
+    }
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "emptyDesc": "Browse our gear and add your favorites",
+    "browseProducts": "Browse Gear",
+    "summary": "Order Summary",
+    "rentTotal": "Rental Subtotal",
+    "accessory": "Accessories",
+    "days": "{days}-day rental",
+    "discount": "Package Discount",
+    "deliveryFee": "Delivery Fee",
+    "total": "Total",
+    "deposit": "Deposit (refundable)",
+    "checkout": "Checkout",
+    "remove": "Remove",
+    "qty": "Qty",
+    "clearCart": "Clear Cart"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "steps": {
+      "date": "Dates",
+      "accessory": "Accessories",
+      "info": "Your Info",
+      "confirm": "Confirm"
+    },
+    "dateHint": "Select your rental dates",
+    "accessoryHint": "Add accessories to enhance your trip",
+    "infoHint": "Make sure your phone is correct for delivery",
+    "confirmHint": "Please review your order, then confirm",
+    "agreement": "I have read and agree to the Rental Agreement",
+    "delivery": {
+      "title": "Delivery Method",
+      "store": {
+        "name": "Store Pickup",
+        "desc": "Pick up in store, no delivery fee"
+      },
+      "resort": {
+        "name": "Resort Delivery",
+        "desc": "Delivered to your resort hotel front desk"
+      },
+      "express": {
+        "name": "Express Shipping",
+        "desc": "SF/JD delivery to your home, 3-5 days"
+      },
+      "selectResort": "Select resort",
+      "selectAddress": "Enter shipping address",
+      "remote": "Remote area",
+      "normal": "Normal area"
+    },
+    "info": {
+      "name": "Name",
+      "phone": "Phone",
+      "idCard": "ID Card",
+      "idCardHint": "For deposit verification",
+      "remarks": "Notes"
+    },
+    "submit": "Place Order",
+    "submitted": "Order Created",
+    "orderId": "Order ID"
+  },
+  "orders": {
+    "title": "My Rentals",
+    "tabs": {
+      "all": "All",
+      "pending": "Pending",
+      "active": "Active",
+      "returned": "Returned"
+    },
+    "empty": "No orders yet",
+    "extend": "Extend",
+    "cancel": "Cancel",
+    "cancelConfirm": "Are you sure you want to cancel this order?",
+    "rentPeriod": "Rental Period",
+    "delivery": "Delivery",
+    "viewDetail": "View Details"
+  },
+  "community": {
+    "title": "Rider Community",
+    "tabs": {
+      "all": "All",
+      "resort": "Resort Tips",
+      "gear": "Gear Talk",
+      "qna": "Q&A",
+      "showcase": "My Setup"
+    },
+    "newPost": "New Post",
+    "firstPost": "Be the first to post",
+    "postDetail": "Post",
+    "noPost": "No posts yet",
+    "beFirst": "Be the first to share",
+    "like": "Like",
+    "comment": "Comment",
+    "commentPlaceholder": "Say something...",
+    "sendComment": "Send",
+    "categories": {
+      "resort": "Resort Tips",
+      "gear": "Gear Talk",
+      "qna": "Q&A",
+      "showcase": "My Setup"
+    },
+    "publishForm": {
+      "category": "Category",
+      "title": "Title",
+      "titlePlaceholder": "Summarize your post in one line",
+      "content": "Content",
+      "contentPlaceholder": "Share your thoughts in detail...",
+      "resort": "Related Resort",
+      "tags": "Tags",
+      "tagsHint": "Separate with commas",
+      "imageUrl": "Image URL",
+      "imageUrlHint": "Optional, paste image URL",
+      "submit": "Publish",
+      "draft": "Save Draft"
+    }
+  },
+  "smart": {
+    "title": "Smart Match",
+    "desc": "Answer 3 questions to find your perfect board",
+    "step1": {
+      "title": "Your skill level?",
+      "desc": "Choose what fits you best",
+      "options": {
+        "beginner": "Beginner - just learned basics",
+        "intermediate": "Intermediate - comfortable on blue runs",
+        "advanced": "Advanced - smooth on black runs",
+        "expert": "Expert - any terrain"
+      }
+    },
+    "step2": {
+      "title": "What terrain?",
+      "desc": "Multi-select",
+      "options": {
+        "groomed": "Groomed runs",
+        "park": "Park",
+        "powder": "Powder",
+        "backcountry": "Backcountry"
+      }
+    },
+    "step3": {
+      "title": "Your measurements?",
+      "desc": "For board length recommendation",
+      "height": "Height (cm)",
+      "weight": "Weight (kg)",
+      "bootSize": "Boot size",
+      "gender": "Gender",
+      "male": "Male",
+      "female": "Female"
+    },
+    "result": {
+      "title": "Recommended for You",
+      "boardSize": "Recommended board length",
+      "match": "{percent}% match",
+      "top3": "Top 3 Picks",
+      "restart": "Match Again"
+    }
+  },
+  "host": {
+    "onboarding": {
+      "title": "Become a Host",
+      "desc": "List your gear, reach more riders",
+      "rolePersonal": "Individual",
+      "roleShop": "Rental Shop",
+      "roleDesc": "Select your role",
+      "agreement": "I have read and agree to the Host Agreement",
+      "complete": "Complete"
+    },
+    "publish": {
+      "title": "List Gear",
+      "titleField": "Title",
+      "titlePlaceholder": "e.g. Burton Custom X 158 All-Mountain",
+      "brand": "Brand",
+      "model": "Model",
+      "year": "Year",
+      "type": "Type",
+      "length": "Length (cm)",
+      "width": "Width (cm)",
+      "flex": "Flex (1-10)",
+      "shape": "Shape",
+      "camber": "Camber",
+      "skillLevel": "Skill Levels",
+      "terrain": "Terrain",
+      "pricePerDay": "Price/day (¥)",
+      "deposit": "Deposit (¥)",
+      "stock": "Stock",
+      "city": "City",
+      "description": "Description",
+      "images": "Images",
+      "imagesHint": "Paste image URLs, one per line",
+      "submit": "Publish",
+      "submitted": "Published!"
+    },
+    "myListings": {
+      "title": "My Listings",
+      "empty": "You haven't listed any gear yet",
+      "firstPublish": "List your first gear",
+      "edit": "Edit",
+      "delist": "Delist",
+      "delete": "Delete",
+      "status": {
+        "active": "Active",
+        "delisted": "Delisted"
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Log In",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log In",
+      "noAccount": "No account?",
+      "register": "Sign up",
+      "forgot": "Forgot password?"
+    },
+    "register": {
+      "title": "Sign Up",
+      "email": "Email",
+      "password": "Password",
+      "passwordHint": "At least 6 characters",
+      "confirmPassword": "Confirm password",
+      "name": "Display name",
+      "submit": "Sign Up",
+      "hasAccount": "Have an account?",
+      "login": "Log in"
+    }
+  },
+  "trust": {
+    "review": {
+      "title": "Reviews",
+      "add": "Write Review",
+      "rating": "Overall",
+      "subRatings": "Sub-ratings",
+      "accuracy": "Accuracy",
+      "communication": "Communication",
+      "condition": "Condition",
+      "tags": "Tags",
+      "comment": "Comment",
+      "anonymous": "Anonymous",
+      "submit": "Submit",
+      "reply": "Host reply",
+      "noReview": "No reviews yet"
+    },
+    "verification": {
+      "title": "ID Verification",
+      "realName": "Real name",
+      "idCard": "ID number",
+      "submit": "Submit",
+      "status": "Status",
+      "pending": "Pending",
+      "approved": "Verified",
+      "rejected": "Rejected"
+    },
+    "message": {
+      "title": "Messages",
+      "inbox": "Inbox",
+      "send": "Send",
+      "noMessage": "No messages"
+    }
+  },
+  "coupon": {
+    "title": "Coupons",
+    "myCoupons": "My Coupons",
+    "useCode": "Use code",
+    "inputPlaceholder": "Enter coupon code",
+    "apply": "Apply",
+    "applied": "Applied",
+    "types": {
+      "fixed": "Amount off",
+      "percent": "Percent off",
+      "shipping": "Free shipping",
+      "newuser": "New user"
+    }
+  },
+  "resort": {
+    "title": "Resorts",
+    "listTitle": "Partner Resorts",
+    "altitude": "Altitude",
+    "runs": "Runs",
+    "region": "Region",
+    "rentHere": "Rent here",
+    "viewListings": "View available gear"
+  },
+  "footer": {
+    "copyright": "© 2026 Snowboard Rental. All rights reserved."
+  },
+  "error": {
+    "networkError": "Network error, please try again",
+    "notFound": "Page not found",
+    "unauthorized": "Please log in first",
+    "serverError": "Server error, please try again later",
+    "offline": "You're offline, some features are limited"
+  },
+  "toast": {
+    "success": "Success",
+    "failed": "Failed",
+    "loading": "Processing..."
+  }
+}

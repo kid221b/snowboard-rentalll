@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- 主页面 -->
   <url>
     <loc>https://kid221b.github.io/snowboard-rentalll/</loc>
     <changefreq>daily</changefreq>
@@ -20,4 +21,27 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
+  <url>
+    <loc>https://kid221b.github.io/snowboard-rentalll/#resorts</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 雪场详情页（hash 路由） -->
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/chongli-wanquan</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/chongli-genting</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/chongli-thaiwoo</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/chongli-cuocao</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/chongli-duolemeidi</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/beijing-jundushan</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/beijing-nanshan</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/beijing-huaibei</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/heilongjiang-yabuli</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/heilongjiang-sunlight</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/jilin-beidahu</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/jilin-songhua</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/xinjiang-tianshan</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/xinjiang-jikepulin</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/sichuan-luding</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://kid221b.github.io/snowboard-rentalll/#resort/yunnan-luoping</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
 </urlset>

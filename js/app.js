@@ -30,7 +30,17 @@ const App = {
     /**
      * 初始化应用
      */
-    init() {
+    async init() {
+        // 初始化 i18n（异步，先等字典加载）
+        if (window.I18N) {
+            await I18N.init();
+            const mount = document.getElementById('localeSwitcher');
+            if (mount) {
+                mount.innerHTML = I18N.renderSwitcher();
+                I18N.bindSwitcher('#localeSwitcher');
+            }
+            I18N.applyToDOM();
+        }
         this.setupNavigation();
         this.setupMobileMenu();
         this.updateCartCount();
@@ -38,6 +48,11 @@ const App = {
         this.setupEventListeners();
         this.initDatePicker();
         this.initAuth();
+        // 雪场路由
+        if (window.ResortRouter) {
+            ResortRouter.init();
+            ResortRouter.handleRoute();
+        }
     },
 
     /**

@@ -226,6 +226,12 @@ const OrderFlow = {
             this.bindDeliveryMethodEvents();
         }
 
+        // 渲染优惠券输入
+        const couponContainer = document.getElementById('couponContainer');
+        if (couponContainer && window.Coupons) {
+            couponContainer.innerHTML = Coupons.renderCouponInput();
+        }
+
         // 加载保存的个人信息
         const savedInfo = SnowboardData.getUserInfo();
         if (savedInfo) {
@@ -327,6 +333,15 @@ const OrderFlow = {
         this.currentDeliveryFee = DeliveryConfig.calculateFee(this.currentDeliveryMethod, { region });
         // 触发 step4 重新渲染（如果有）
         if (this.currentStep === 4) this.initStep4();
+    },
+
+    /**
+     * 刷新订单摘要（用于优惠券 / 交付方式变化时）
+     */
+    refreshSummary() {
+        if (this.currentStep === 4) {
+            this.initStep4();
+        }
     },
 
     /**
@@ -440,6 +455,14 @@ const OrderFlow = {
             region: this.personalInfo.expressRegion
         });
 
+        // 优惠券折扣
+        const appliedCoupon = window.Coupons ? Coupons.getAppliedCoupon() : null;
+        const orderSummary = { subtotal: total + savings, deliveryFee, accessoryTotal };
+        const couponResult = window.Coupons ? Coupons.calculateDiscount(orderSummary, appliedCoupon) : { discountAmount: 0, finalDelivery: deliveryFee, finalTotal: total + deliveryFee + deposit };
+        const finalDeliveryFee = couponResult.finalDelivery !== undefined ? couponResult.finalDelivery : deliveryFee;
+        const couponDiscount = couponResult.discountAmount || 0;
+        const finalTotal = couponResult.finalTotal !== undefined ? couponResult.finalTotal : (total + deliveryFee + deposit);
+
         // 交付方式描述
         const deliveryDesc = DeliveryConfig.describe(this.currentDeliveryMethod, {
             resortId: this.personalInfo.deliveryResort,
@@ -514,7 +537,18 @@ const OrderFlow = {
                 ${deliveryFee > 0 ? `
                     <div class="item-row">
                         <span>${this.currentDeliveryMethod === 'express' ? '快递费' : '雪场直送费'}</span>
-                        <span>¥${deliveryFee}</span>
+                        <span>${finalDeliveryFee === 0 ? '<span style="color:var(--success-color);">免运费</span>' : '¥' + finalDeliveryFee}</span>
+                    </div>
+                ` : ''}
+                ${couponDiscount > 0 && appliedCoupon ? `
+                    <div class="item-row" style="color: var(--success-color);">
+                        <span>优惠券 (${this.escapeHtml(appliedCoupon.name)})</span>
+                        <span>-¥${Math.round(couponDiscount)}</span>
+                    </div>
+                ` : ''}
+                ${appliedCoupon && couponResult.belowMinSpend ? `
+                    <div class="item-row" style="color: var(--warning-color); font-size:0.85rem;">
+                        <span>⚠ 订单未满 ¥${couponResult.minSpend}，优惠未生效</span>
                     </div>
                 ` : ''}
                 <div class="item-row">
@@ -523,7 +557,7 @@ const OrderFlow = {
                 </div>
                 <div class="item-row total">
                     <span>应付总额</span>
-                    <span>¥${total + deliveryFee + deposit}</span>
+                    <span>¥${finalTotal + deposit}</span>
                 </div>
             </div>
         `;

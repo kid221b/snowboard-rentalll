@@ -1,0 +1,96 @@
+{
+  "name": "冰雪之巅 - 专业单板滑雪装备租赁",
+  "short_name": "冰雪之巅",
+  "description": "面向中阶/高阶滑雪爱好者的单板装备 C2C + B2C 双边租赁平台。智能推荐 + 信誉体系 + 雪友社区。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f5f7fa",
+  "theme_color": "#4a90e2",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "categories": ["sports", "lifestyle", "shopping"],
+  "icons": [
+    {
+      "src": "icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "智能推荐",
+      "short_name": "推荐",
+      "description": "3 步找到适合你的单板",
+      "url": "./index.html#smart-recommend",
+      "icons": [{ "src": "icons/shortcut-recommend.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "雪友社区",
+      "short_name": "社区",
+      "description": "雪场攻略 / 装备讨论 / 问答",
+      "url": "./index.html#community",
+      "icons": [{ "src": "icons/shortcut-community.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "我的订单",
+      "short_name": "订单",
+      "description": "查看历史租赁",
+      "url": "./index.html#orders",
+      "icons": [{ "src": "icons/shortcut-orders.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icons/screenshot-home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "冰雪之巅首页"
+    }
+  ]
+}

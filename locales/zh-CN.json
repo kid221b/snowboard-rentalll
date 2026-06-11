@@ -1,0 +1,440 @@
+{
+  "meta": {
+    "lang": "zh-CN",
+    "name": "简体中文"
+  },
+  "common": {
+    "appName": "冰雪之巅",
+    "appFullName": "冰雪之巅 - 专业单板滑雪装备租赁",
+    "tagline": "专业单板 · 智能推荐 · 信誉保障",
+    "loading": "加载中...",
+    "retry": "重试",
+    "cancel": "取消",
+    "confirm": "确认",
+    "save": "保存",
+    "edit": "编辑",
+    "delete": "删除",
+    "submit": "提交",
+    "back": "返回",
+    "next": "下一步",
+    "prev": "上一步",
+    "close": "关闭",
+    "viewMore": "查看更多",
+    "viewAll": "查看全部",
+    "search": "搜索",
+    "more": "更多",
+    "less": "收起",
+    "free": "免费",
+    "yes": "是",
+    "no": "否"
+  },
+  "nav": {
+    "home": "首页",
+    "products": "装备租赁",
+    "community": "雪友社区",
+    "cart": "购物车",
+    "orders": "我的租赁",
+    "admin": "管理面板",
+    "publish": "发布雪具",
+    "login": "登录",
+    "register": "注册",
+    "logout": "退出登录",
+    "messages": "消息中心"
+  },
+  "home": {
+    "hero": {
+      "title": "🏂 冰雪之巅 畅滑无忧",
+      "subtitle": "面向中阶/高阶雪友的双边租赁平台",
+      "desc": "智能匹配适合你的单板 · 实名认证 · 雪场直送",
+      "ctaRent": "立即租装备",
+      "ctaRecommend": "开始智能推荐"
+    },
+    "packages": {
+      "title": "灵活套餐",
+      "weekend": {
+        "name": "周末畅滑",
+        "days": "2 天",
+        "desc": "短途出行最佳"
+      },
+      "short": {
+        "name": "短途之旅",
+        "days": "3 天",
+        "desc": "说走就走的周末+1"
+      },
+      "long": {
+        "name": "深度体验",
+        "days": "5 天",
+        "desc": "练习进阶技术的最佳周期"
+      },
+      "vacation": {
+        "name": "度假首选",
+        "days": "7 天",
+        "desc": "一整周的雪场时光"
+      }
+    },
+    "features": {
+      "title": "为什么选择我们",
+      "quality": {
+        "title": "专业品质",
+        "desc": "全部装备经过专业维护，性能可靠"
+      },
+      "delivery": {
+        "title": "便捷配送",
+        "desc": "门店/雪场/快递三种交付方式"
+      },
+      "price": {
+        "title": "价格实惠",
+        "desc": "套餐立省，押金可退，无隐藏费用"
+      },
+      "safety": {
+        "title": "安全保障",
+        "desc": "实名认证 + 信誉体系，租借透明"
+      }
+    },
+    "hot": "热门单板",
+    "hotDesc": "雪友口碑推荐"
+  },
+  "products": {
+    "title": "装备租赁",
+    "tabs": {
+      "all": "全部",
+      "recommend": "为你推荐",
+      "hot": "热门",
+      "suitable": "合适尺寸"
+    },
+    "filter": {
+      "type": "类型",
+      "price": "价格",
+      "brand": "品牌",
+      "reset": "重置筛选"
+    },
+    "sort": {
+      "label": "排序",
+      "default": "默认",
+      "priceAsc": "价格升序",
+      "priceDesc": "价格降序",
+      "sales": "销量",
+      "rating": "好评"
+    },
+    "card": {
+      "stock": "有货 ({count})",
+      "outOfStock": "缺货",
+      "hot": "热门",
+      "perDay": "/天"
+    },
+    "detail": {
+      "specs": "规格参数",
+      "features": "产品特点",
+      "skills": "适合技能",
+      "terrain": "适合地形",
+      "description": "详细介绍",
+      "recommendFor": "推荐人群",
+      "addToCart": "加入购物车",
+      "rentNow": "立即租赁",
+      "deposit": "押金",
+      "stock": "库存",
+      "views": "浏览",
+      "hostInfo": "发布者信息",
+      "noHost": "平台自营",
+      "backToList": "返回列表"
+    }
+  },
+  "cart": {
+    "title": "购物车",
+    "empty": "购物车空空如也",
+    "emptyDesc": "去挑几件心仪的装备吧",
+    "browseProducts": "去看装备",
+    "summary": "费用明细",
+    "rentTotal": "租金合计",
+    "accessory": "配件",
+    "days": "租期 {days} 天",
+    "discount": "套餐优惠",
+    "deliveryFee": "运费",
+    "total": "应付总额",
+    "deposit": "押金（可退）",
+    "checkout": "去结算",
+    "remove": "移除",
+    "qty": "数量",
+    "clearCart": "清空购物车"
+  },
+  "checkout": {
+    "title": "结算",
+    "steps": {
+      "date": "选择日期",
+      "accessory": "选择配件",
+      "info": "填写信息",
+      "confirm": "确认订单"
+    },
+    "dateHint": "请选择租赁起止日期",
+    "accessoryHint": "可选配件提升雪场体验",
+    "infoHint": "确保手机号正确，方便联系",
+    "confirmHint": "请核对订单信息，提交后将创建订单",
+    "agreement": "我已阅读并同意《租赁协议》",
+    "delivery": {
+      "title": "交付方式",
+      "store": {
+        "name": "门店自取",
+        "desc": "到店自取，零运费"
+      },
+      "resort": {
+        "name": "雪场直送",
+        "desc": "配送到您入住的雪场酒店，前台代收"
+      },
+      "express": {
+        "name": "快递上门",
+        "desc": "顺丰/京东直送到家，3-5 天到达"
+      },
+      "selectResort": "选择雪场",
+      "selectAddress": "请输入快递地址",
+      "remote": "偏远地区",
+      "normal": "普通地区"
+    },
+    "info": {
+      "name": "姓名",
+      "phone": "手机号",
+      "idCard": "身份证号",
+      "idCardHint": "用于押金验证",
+      "remarks": "备注"
+    },
+    "submit": "提交订单",
+    "submitted": "订单已创建",
+    "orderId": "订单号"
+  },
+  "orders": {
+    "title": "我的租赁",
+    "tabs": {
+      "all": "全部订单",
+      "pending": "待取板",
+      "active": "租赁中",
+      "returned": "已归还"
+    },
+    "empty": "还没有订单",
+    "extend": "续租",
+    "cancel": "取消订单",
+    "cancelConfirm": "确定取消这笔订单吗？",
+    "rentPeriod": "租赁期",
+    "delivery": "交付方式",
+    "viewDetail": "查看详情"
+  },
+  "community": {
+    "title": "雪友社区",
+    "tabs": {
+      "all": "全部",
+      "resort": "雪场攻略",
+      "gear": "装备讨论",
+      "qna": "问答",
+      "showcase": "晒板"
+    },
+    "newPost": "发布新帖",
+    "firstPost": "发布第一帖",
+    "postDetail": "帖子详情",
+    "noPost": "还没有相关帖子",
+    "beFirst": "成为第一个分享的人",
+    "like": "点赞",
+    "comment": "评论",
+    "commentPlaceholder": "说点什么...",
+    "sendComment": "发送",
+    "categories": {
+      "resort": "雪场攻略",
+      "gear": "装备讨论",
+      "qna": "问答",
+      "showcase": "晒板"
+    },
+    "publishForm": {
+      "category": "分类",
+      "title": "标题",
+      "titlePlaceholder": "用一句话概括你的内容",
+      "content": "正文",
+      "contentPlaceholder": "详细描述你想分享的内容...",
+      "resort": "相关雪场",
+      "tags": "标签",
+      "tagsHint": "用逗号分隔",
+      "imageUrl": "图片链接",
+      "imageUrlHint": "可选，填入图片 URL",
+      "submit": "发布",
+      "draft": "存草稿"
+    }
+  },
+  "smart": {
+    "title": "智能推荐",
+    "desc": "回答 3 个问题，找到适合你的单板",
+    "step1": {
+      "title": "你的滑雪水平？",
+      "desc": "选择最接近你目前的水平",
+      "options": {
+        "beginner": "新手 - 刚学会基本动作",
+        "intermediate": "初中级 - 中级道顺畅",
+        "advanced": "中高级 - 高级道流畅",
+        "expert": "专业 - 任何地形"
+      }
+    },
+    "step2": {
+      "title": "你想去什么地形？",
+      "desc": "可多选",
+      "options": {
+        "groomed": "机压雪道",
+        "park": "公园",
+        "powder": "粉雪",
+        "backcountry": "野雪"
+      }
+    },
+    "step3": {
+      "title": "你的身材？",
+      "desc": "用于推荐合适的板长",
+      "height": "身高 (cm)",
+      "weight": "体重 (kg)",
+      "bootSize": "雪鞋尺码",
+      "gender": "性别",
+      "male": "男",
+      "female": "女"
+    },
+    "result": {
+      "title": "为你推荐",
+      "boardSize": "推荐板长",
+      "match": "{percent}% 匹配",
+      "top3": "Top 3 推荐",
+      "restart": "重新推荐"
+    }
+  },
+  "host": {
+    "onboarding": {
+      "title": "成为发布者",
+      "desc": "发布你的雪具，让更多雪友租到",
+      "rolePersonal": "个人发布者",
+      "roleShop": "雪具店",
+      "roleDesc": "选择你的身份",
+      "agreement": "我已阅读并同意《发布者协议》",
+      "complete": "完成入驻"
+    },
+    "publish": {
+      "title": "发布雪具",
+      "titleField": "雪具标题",
+      "titlePlaceholder": "例如：Burton Custom X 158 全能板",
+      "brand": "品牌",
+      "model": "型号",
+      "year": "年份",
+      "type": "类型",
+      "length": "板长 (cm)",
+      "width": "板宽 (cm)",
+      "flex": "硬度 (1-10)",
+      "shape": "板型",
+      "camber": "板底曲线",
+      "skillLevel": "适合技能",
+      "terrain": "适合地形",
+      "pricePerDay": "日租金 (¥)",
+      "deposit": "押金 (¥)",
+      "stock": "库存数量",
+      "city": "所在城市",
+      "description": "详细介绍",
+      "images": "图片",
+      "imagesHint": "粘贴图片 URL，每行一个",
+      "submit": "发布",
+      "submitted": "发布成功！"
+    },
+    "myListings": {
+      "title": "我的发布",
+      "empty": "还没有发布过雪具",
+      "firstPublish": "发布第一件雪具",
+      "edit": "编辑",
+      "delist": "下架",
+      "delete": "删除",
+      "status": {
+        "active": "在售",
+        "delisted": "已下架"
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "登录",
+      "email": "邮箱",
+      "password": "密码",
+      "submit": "登录",
+      "noAccount": "还没有账号？",
+      "register": "立即注册",
+      "forgot": "忘记密码？"
+    },
+    "register": {
+      "title": "注册",
+      "email": "邮箱",
+      "password": "密码",
+      "passwordHint": "至少 6 位",
+      "confirmPassword": "确认密码",
+      "name": "昵称",
+      "submit": "注册",
+      "hasAccount": "已有账号？",
+      "login": "立即登录"
+    }
+  },
+  "trust": {
+    "review": {
+      "title": "评价",
+      "add": "写评价",
+      "rating": "总评分",
+      "subRatings": "子评分",
+      "accuracy": "描述准确",
+      "communication": "沟通",
+      "condition": "装备状况",
+      "tags": "标签",
+      "comment": "评价内容",
+      "anonymous": "匿名发布",
+      "submit": "提交评价",
+      "reply": "卖家回复",
+      "noReview": "还没有评价"
+    },
+    "verification": {
+      "title": "实名认证",
+      "realName": "真实姓名",
+      "idCard": "身份证号",
+      "submit": "提交认证",
+      "status": "认证状态",
+      "pending": "审核中",
+      "approved": "已认证",
+      "rejected": "已拒绝"
+    },
+    "message": {
+      "title": "站内信",
+      "inbox": "收件箱",
+      "send": "发消息",
+      "noMessage": "没有消息"
+    }
+  },
+  "coupon": {
+    "title": "优惠券",
+    "myCoupons": "我的优惠券",
+    "useCode": "使用优惠码",
+    "inputPlaceholder": "输入优惠码",
+    "apply": "应用",
+    "applied": "已应用",
+    "types": {
+      "fixed": "满减券",
+      "percent": "折扣券",
+      "shipping": "免运费",
+      "newuser": "新人专享"
+    }
+  },
+  "resort": {
+    "title": "雪场",
+    "listTitle": "全国合作雪场",
+    "altitude": "海拔",
+    "runs": "雪道数",
+    "region": "地区",
+    "rentHere": "在这里租装备",
+    "viewListings": "查看可租装备"
+  },
+  "footer": {
+    "copyright": "© 2026 冰雪之巅 Snowboard Rental. All rights reserved."
+  },
+  "error": {
+    "networkError": "网络错误，请稍后重试",
+    "notFound": "页面不存在",
+    "unauthorized": "请先登录",
+    "serverError": "服务器错误，请稍后重试",
+    "offline": "当前离线，部分功能不可用"
+  },
+  "toast": {
+    "success": "操作成功",
+    "failed": "操作失败",
+    "loading": "处理中..."
+  }
+}

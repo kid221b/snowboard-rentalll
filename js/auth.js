@@ -74,6 +74,11 @@ export async function register(email, password, name, phone) {
             if (profileError) {
                 console.warn('创建资料失败:', profileError);
             }
+
+            // 发放新人优惠券
+            if (window.Coupons) {
+                Coupons.issueNewUserCoupons();
+            }
         }
 
         currentUser = data.user;
